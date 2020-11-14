@@ -28,6 +28,7 @@
 					<div class="layui-row">
 						<div class="layui-col-md2">
 							<div class="imageDiv">
+								<p>无人机数量</p>
 								<img id="drones" class="imageClass"  src="./layui/images/无人机.png">
 							</div>
 							<div class="imageDiv">
@@ -47,20 +48,23 @@
 							</div>
 							
 						</div>
-						<div class="layui-col-md8" style="padding: 10px;">
+						<div class="layui-col-md7" style="padding: 10px;">
 							<canvas id="canvas" width="800" height="800" style="border:1px solid;display:block;">
 							</canvas>
 							<div id="wrap" style="display:none;">
 							</div>
 							<div>
-								<textarea id="info" name="info" style="margin:20px;resize: none;"  class="layui-textarea"></textarea>
+								<textarea id="info" name="info" style="margin-top:5px;resize: none; width: 800px; "  class="layui-textarea"></textarea>
 							</div>
 						</div>
-						<div class="layui-col-md2">
-							<div id="progress">
-								<div class="layui-progress" lay-filter="progress">
-									<div class="layui-progress-bar" lay-percent="0%" lay-showPercent="true"></div>
-								</div>
+						<div class="layui-col-md2" style="padding-top: 10px;">
+							<div style="height: 600px;" id="infoDiv">
+								<label>无人机信息</label>
+								<!-- <div id="progress">
+									<div class="layui-progress" lay-filter="progress">
+										<div class="layui-progress-bar" lay-percent="0%" lay-showPercent="true"></div>
+									</div>
+								</div> -->
 							</div>
 							<div class="input-group mb-3">
 								<hr class="layui-bg-red">

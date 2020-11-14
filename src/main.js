@@ -136,6 +136,16 @@ $(function() {
 });
 
 function MoveProgress(){
+	let htmllet = `
+	<div id="progress">
+		<p>探测任务执行进度</p>
+		<div class="layui-progress" lay-filter="progress">
+			<div class="layui-progress-bar" lay-percent="0%" lay-showPercent="true"></div>
+		</div>
+	</div>
+	`;
+	$('#infoDiv').append(htmllet);
+	
 	tools.startProgress();
 		target = 0;//目标数
 		drone = 0; //无人机数
