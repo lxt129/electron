@@ -1,19 +1,106 @@
-<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
-
-    <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
-  </body>
+	<head>
+		<link rel="stylesheet" href="./layui/css/layui.css">
+		<link rel="stylesheet" href="./css/style.css" />
+		<style type="text/css">
+		</style>
+	</head>
+	<body>
+		<div>
+			<div class="row-fluid">
+				<div style="margin-left: 5%;margin-right: 5%;">
+				<div class="layui-container">
+					<div class="layui-row">
+						<div class="layui-col-md3">
+							<button id="mapBtn" class="layui-btn layui-btn-primary">设置区域</button>
+						</div>
+						<div class="layui-col-md3">
+							<button id="resBtn" class="layui-btn layui-btn-primary">设置设备资源</button>
+						</div>
+						<div class="layui-col-md3">
+							<button id="resParametersBtn" class="layui-btn layui-btn-primary">设置设备资源参数</button>
+						</div>
+						<div class="layui-col-md3">
+							<button id="taskBtn" class="layui-btn layui-btn-primary">设置任务的完成条件</button>
+						</div>
+					</div>
+				</div>
+					<div class="layui-row">
+						<div class="layui-col-md2">
+							<div class="imageDiv">
+								<img id="drones" class="imageClass"  src="./layui/images/无人机.png">
+							</div>
+							<div class="imageDiv">
+								<img id="dronesWithArms" class="imageClass"  src="./layui/images/无人机 (1).png">
+							</div>
+							<div class="imageDiv">
+								<img id="ship" class="imageClass"  src="./layui/images/帆船.png">
+							</div>
+							<div class="imageDiv">
+								<img id="shipWithArms" class="imageClass"  src="./layui/images/帆船 (1).png">
+							</div>
+							<div class="imageDiv">
+								<img id="submarine" class="imageClass"  src="./layui/images/潜艇.png">
+							</div>
+							<div class="imageDiv">
+								<img id="submarineWithArms" class="imageClass"  src="./layui/images/潜艇 (1).png">
+							</div>
+							
+						</div>
+						<div class="layui-col-md8" style="padding: 10px;">
+							<canvas id="canvas" width="800" height="800" style="border:1px solid;display:block;">
+							</canvas>
+							<div id="wrap" style="display:none;">
+							</div>
+							<div>
+								<textarea id="info" name="info" style="margin:20px;resize: none;"  class="layui-textarea"></textarea>
+							</div>
+						</div>
+						<div class="layui-col-md2">
+							<div id="progress">
+								<div class="layui-progress" lay-filter="progress">
+									<div class="layui-progress-bar" lay-percent="0%" lay-showPercent="true"></div>
+								</div>
+							</div>
+							<div class="input-group mb-3">
+								<hr class="layui-bg-red">
+								<div id="status" class="show-grid" style="display:block;"></div>
+								<div class="layui-form-item">
+									<button id="addRandom_btn" class="layui-btn">随机增加20个点</button>
+									<button id="clear_btn" class="layui-btn">重置</button>
+								</div>
+								<div class="layui-form-item">
+									<button id="start_btn" class="layui-btn" lay-submit="" lay-filter="">开始/重新开始</button>
+									<!-- <button id="avoidHidden" class="layui-btn">避障路线</button> -->
+									<button id="stop_btn" class="layui-btn">停止/继续</button>
+								</div>
+								<div class="layui-form-item">
+									<button id="move" type="button" class="layui-btn">运动轨迹</button>
+								</div>
+								<!-- <button id="start_btn" class="btn">Start/Restart</button> -->
+								
+							</div>
+						</div>
+					</div>
+				
+				</div>
+			</div>
+			<script>
+				window.nodeRequire = require;
+				delete window.require;
+				delete window.exports;
+				delete window.module;
+			</script>
+			<script type="text/javascript" src="./layui/layui.js"></script>
+			<script type="text/javascript" src="./layui/jquery-3.2.1.min.js"></script>
+			<script type="text/javascript" src="./src/main.js"></script>
+			<script type="text/javascript" src="./src/algorithm.js"></script>
+			<script type="text/javascript" src="./src/utils.js"></script>
+			<script type="text/javascript" src="./src/data.js"></script>
+			<script type="text/javascript" src="./src/move.js"></script>
+			<script type="text/javascript" src="./src/Astar.js"></script>
+			<script type="text/javascript" src="./src/canvas.js"></script>
+			<script type="text/javascript" src="./parameterSettings/mapParameters.js"></script>
+			<script type="text/javascript" src="./src/layuiUtils.js"></script>
+	</body>
 </html>
