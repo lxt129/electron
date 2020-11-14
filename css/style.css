@@ -1,0 +1,58 @@
+#canvas {
+    border-radius: 5px;
+	width: 800px;
+	height: 800px;
+}
+
+#title {
+    margin-top: 34px;
+    font-size: 32px;
+    display: block;
+    margin-bottom: 9px;
+    letter-spacing: -1px;
+}
+
+#control_bottons {
+    margin: 10px;
+}
+
+#status {
+    margin: 10px;
+    padding: 15px;
+    /* text-align: center; */
+}
+
+.layui-input, .layui-textarea {
+    display: block;
+    width: 80%;
+    padding-left: 10px;
+}
+.layui-form-label {
+    float: left;
+    display: block;
+    padding: 9px 15px;
+    width: 115px;
+    font-weight: 400;
+    line-height: 20px;
+    /* text-align: right; */
+}
+footer {
+    margin-left: -150px;
+    text-align: center;
+}
+ #wrap{
+    height: 100px;
+    width:100px;
+	background:blue;
+	position: absolute;
+}
+
+.imageClass{
+    height: 100px;
+    width: 100px;
+}
+
+.imageDiv{
+    text-align: center;
+    margin: 10px;
+}
