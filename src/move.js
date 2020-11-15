@@ -115,6 +115,20 @@ let end = 0;
 
 function startMove() {
 	for (let i = 0; i < routes.length; i++) {
+		if(i < SALES_MEN){
+			$(eval('device'+i)).html(
+				`
+				<p>探测无人机${i + 1}坐标(${~~(animatePoint[i].x)},${~~(animatePoint[i].y)})</p>
+				`
+				)
+		}else{
+			$(eval('device'+i)).html(
+				`
+				<p>执行任务无人机${i+1}的坐标(${~~(animatePoint[i].x)},${~~(animatePoint[i].y)})</p>
+				`
+				)
+		}
+			
 		//------------------------------------------资源最少方案------------------------------------------
 		if(taskProgramme === 1){
 			//发现目标点后派出无人机 条件一 路径长度 > 1 条件2 上一个点是目标点 条件3 是否为最后一个点  条件4不是探测任务 
@@ -202,8 +216,9 @@ function startMove() {
 					}
 				}
 				//console.log(i,taskFalg,status[a])
-				for(let a = 0;a < status.length;a++){
+				//for(let a = 0;a < status.length;a++){
 					if(status[a] === true){
+						console.log(a)
 						status[a] = false;
 						taskStatusIndex.push(a);
 						taskSort.push(routes[i][nextPointIndex[i] - 1])
@@ -217,11 +232,16 @@ function startMove() {
 							taskSort[0].isComplete = true;
 							taskSort.shift();
 							status[taskStatusIndex[0]] = true;
+							console.log("!!!!!!!!!!!!!!!!")
+							console.log(taskStatusIndex[0],status[taskStatusIndex[0]])
+							for(let b=0;b < status.length;b++){
+								console.log(b,status[b]);
+							}
+							console.log("!!!!!!!!!!!!!!!!")
 							taskStatusIndex.shift();
-
 						},sleep) 
 					}
-				}
+				//}
 				continue;
 			}
 		
@@ -243,51 +263,62 @@ function startMove() {
 						d = a;
 						e = a*c + SALES_MEN;
 						for(let b = 0;b < c;b++){
-							console.log(status[a])
 							addRoute3(e + b,routes[e + b][routes[e + b].length -1],routes[0][0]);
-							console.log(routes[e + b])
 						}
 						status[d] = false;
 					}
 				}
 			}
 		}
-
-
-		
+	
 		//***********************************************发现目标点***********************************************
 		if (routes[i].length > 0 && routes[i][nextPointIndex[i] - 1].hasOwnProperty('isTargetUnfind') == true && routes[i][nextPointIndex[i] - 1].isTarget !== true) {
 			routes[i][nextPointIndex[i] - 1].isTarget = true;
 			targetNum[i] += 3;
 			target++;
+			if(i < SALES_MEN){
+				addinfo("发现"+target+"号目标!!!"+"目标坐标为:("+routes[i][nextPointIndex[i] - 1].x+","+routes[i][nextPointIndex[i] - 1].y+")");
+			}
 			//------------------------------------------资源最少方案------------------------------------------
 			if(taskProgramme === 1){
 				//探测任务  taskType:任务类型 1 探测 2围捕 3打击
 				if(taskType === 1 && targetNum[i] === 1){
-					addinfo("发现"+target+"号目标!!!");
+					
 				}else if(taskType === 2) { //围捕任务
-					addinfo("发现"+target+"号目标!!!");
 					addinfo("进行围捕任务");
 					routes[i][nextPointIndex[i] - 1].isSurround = 0;
 					targetPointSurround.push(routes[i][nextPointIndex[i] - 1]);
 					let k = roundUpRequirement;
 					if(target === 1){
+						let a = -1;
+						let htmllet;
 						while(k > 0){
-							newAddRoute.push(addRoute(routes[i][nextPointIndex[i] - 1]));
+							a = addRoute(routes[i][nextPointIndex[i] - 1]);
+							newAddRoute.push(a);
+							htmllet = `
+							<div id="device${a}" style="display:block;margin-top:5px"></div>
+							`;
+							$('#infoDiv').append(htmllet);
 							k = k - 1;
 						}
 					}else{
 						nextTarget.push(routes[i][nextPointIndex[i] - 1]);	
 					}
 				}else if (taskType === 3) {//打击任务
-					addinfo("发现"+target+"号目标!!!");
 					addinfo("进行打击任务");
 					routes[i][nextPointIndex[i] - 1].isHit = 0;
 					targetPointHit.push(routes[i][nextPointIndex[i] - 1]);
 					let k = attackRequirement;
 					if(target === 1){
+						let a = -1;
+						let htmllet;
 						while(k > 0){
-							newAddRoute.push(addRoute(routes[i][nextPointIndex[i] - 1]));
+							a = addRoute(routes[i][nextPointIndex[i] - 1]);
+							newAddRoute.push(a);
+							htmllet = `
+							<div id="device${a}" style="display:block;margin-top:5px"></div>
+							`;
+							$('#infoDiv').append(htmllet);
 							k = k - 1;
 						}
 					}else{
@@ -298,18 +329,26 @@ function startMove() {
 			//------------------------------------------时间最少方案------------------------------------------
 				//探测任务  taskType:任务类型 1 探测 2围捕 3打击
 				if(taskType === 1 && targetNum[i] === 1){
-					addinfo("发现"+target+"号目标!!!");
+					
 				}else if(taskType === 2) { //围捕任务
-					addinfo("发现"+target+"号目标!!!");
 					addinfo("进行围捕任务");
 					routes[i][nextPointIndex[i] - 1].isSurround = 0;
 					targetPointSurround.push(routes[i][nextPointIndex[i] - 1]);
 					let k = roundUpRequirement;
 					if(target === 1){
+						let a = -1;
+						let htmllet;
 						while(k > 0){
-							newAddRoute.push(addRoute(routes[i][nextPointIndex[i] - 1]));
+							a = addRoute(routes[i][nextPointIndex[i] - 1]);
+							newAddRoute.push(a);
+							htmllet = `
+							<div id="device${a}" style="display:block;margin-top:5px"></div>
+							`;
+							$('#infoDiv').append(htmllet);
 							k = k - 1;
 						}
+						status[goTaskNumner] = false;
+						goTaskNumner++;
 					}else{
 						let key = false;
 						nextTarget.push(routes[i][nextPointIndex[i] - 1]);
@@ -341,28 +380,29 @@ function startMove() {
 						}
 						if(key === false){
 							let a = -1;
+							let htmllet;
 							while(k > 0){
-								a = addRoute(routes[i][nextPointIndex[i] - 1])
+								a = addRoute(routes[i][nextPointIndex[i] - 1]);
 								newAddRoute.push(a);
+								htmllet = `
+								<div id="device${a}" style="display:block;margin-top:5px"></div>
+								`;
+								$('#infoDiv').append(htmllet);
 								k = k - 1;
 							}
-							status[goTaskNumner] = false;
-							goTaskNumner++;
+							status[status.length] = false;
 						}else{
 							let c = indexSelect ;
 							a = indexSelect * roundUpRequirement + SALES_MEN
 							for(let b = 0;b < roundUpRequirement; b++){
-								console.log(a + b,routes[a + b])
 								addRoute3(a + b,routes[a + b][routes[a + b].length -1],point);
 								targetNum[a + b] = 0;
 							}
 							status[c] = false;
 							break;
 						}
-
 					}
 				}else if (taskType === 3) {//打击任务
-					addinfo("发现"+target+"号目标!!!");
 					console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 					addinfo("进行打击任务");
 					routes[i][nextPointIndex[i] - 1].isHit = 0;
@@ -370,9 +410,14 @@ function startMove() {
 					let k = attackRequirement;
 					if(target === 1){
 						let a = -1;
+						let htmllet;
 						while(k > 0){
-							a = addRoute(routes[i][nextPointIndex[i] - 1])
+							a = addRoute(routes[i][nextPointIndex[i] - 1]);
 							newAddRoute.push(a);
+							htmllet = `
+							<div id="device${a}" style="display:block;margin-top:5px"></div>
+							`;
+							$('#infoDiv').append(htmllet);
 							k = k - 1;
 						}
 						status[goTaskNumner] = false;
@@ -408,13 +453,17 @@ function startMove() {
 						}
 						if(key === false){
 							let a = -1;
+							let htmllet;
 							while(k > 0){
-								a = addRoute(routes[i][nextPointIndex[i] - 1])
+								a = addRoute(routes[i][nextPointIndex[i] - 1]);
 								newAddRoute.push(a);
+								htmllet = `
+								<div id="device${a}" style="display:block;margin-top:5px"></div>
+								`;
+								$('#infoDiv').append(htmllet);
 								k = k - 1;
 							}
-							status[goTaskNumner] = false;
-							goTaskNumner++;
+							status[status.length] = false;
 						}else{
 							let c = indexSelect ;
 							a = indexSelect * attackRequirement + SALES_MEN

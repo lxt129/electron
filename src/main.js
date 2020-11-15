@@ -131,6 +131,7 @@ $(function() {
 		drawAvoidHidden(best);
 	})
 	$('#move').click(function() {
+		$("#infoDiv").empty();
 		tools.messageComfirm()
 	})
 });
@@ -144,6 +145,9 @@ function MoveProgress(){
 		</div>
 	</div>
 	`;
+	for(let i=0;i< SALES_MEN;i++){
+		htmllet = htmllet + `<div id="device${i}" style="display:block;margin-top:5px"></div>`
+	}
 	$('#infoDiv').append(htmllet);
 	
 	tools.startProgress();
@@ -151,9 +155,6 @@ function MoveProgress(){
 		drone = 0; //无人机数
 		$('#info').val('');
 		addinfo("巡查任务开始...");
-		hitRate = $('input[name="hitRate"]').val()||35; 
-		surroundRate = $('input[name="surroundRate"]').val()||50;
-		console.log(hitRate,surroundRate)
 		for (var i = 0; i < 5; i++) {
 			var rand = randomNumber(points.length);
 			if(rand < SALES_MEN){
