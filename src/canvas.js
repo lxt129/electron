@@ -103,29 +103,53 @@ function drawHiddenArea(point) {
 
 //画线
 function drawLines(array) {
-	colorArray = ['#f00', '#00FF00', '#0101DF', '#000000', '#F9ED09', '#C700B3'];
-	var colorIndex = 0;
-	ctx.strokeStyle = colorArray[colorIndex];
+	colorArray = ['#f00','#00FF00','#0101DF','#000000','#F9ED09','#C700B3'];
+	ctx.strokeStyle = colorArray[0];
+	var colorIndex = 1;
 	ctx.lineWidth = 1;
 	ctx.beginPath();
-	var index = array[0];
 	ctx.moveTo(points[array[0]].x, points[array[0]].y);
 	for (var i = 1; i < array.length; i++) {
-		if (array[i] < SALES_MEN && array[i - 1] < SALES_MEN) {
+		ctx.lineTo(points[array[i]].x, points[array[i]].y)
+		if(array[i] === 0){ 
 			ctx.stroke();
-			ctx.closePath();
-			colorIndex++;
 			ctx.beginPath();
-			ctx.strokeStyle = colorArray[colorIndex];
 			ctx.moveTo(points[array[i]].x, points[array[i]].y);
-		} else {
-			ctx.lineTo(points[array[i]].x, points[array[i]].y)
+			if(SALES_MEN === colorIndex){
+				ctx.strokeStyle = colorArray[0];
+			}else{
+				ctx.strokeStyle = colorArray[colorIndex];
+			}
+			colorIndex = (colorIndex+1)%colorArray.length;
 		}
 	}
-	//ctx.lineTo(points[array[0]].x, points[array[0]].y);
+	ctx.lineTo(points[array[0]].x, points[array[0]].y);
 
 	ctx.stroke();
 	ctx.closePath();
+	// colorArray = ['#f00', '#00FF00', '#0101DF', '#000000', '#F9ED09', '#C700B3'];
+	// var colorIndex = 0;
+	// ctx.strokeStyle = colorArray[colorIndex];
+	// ctx.lineWidth = 1;
+	// ctx.beginPath();
+	// var index = array[0];
+	// ctx.moveTo(points[array[0]].x, points[array[0]].y);
+	// for (var i = 1; i < array.length; i++) {
+	// 	if (array[i] < SALES_MEN && array[i - 1] < SALES_MEN) {
+	// 		ctx.stroke();
+	// 		ctx.closePath();
+	// 		colorIndex++;
+	// 		ctx.beginPath();
+	// 		ctx.strokeStyle = colorArray[colorIndex];
+	// 		ctx.moveTo(points[array[i]].x, points[array[i]].y);
+	// 	} else {
+	// 		ctx.lineTo(points[array[i]].x, points[array[i]].y)
+	// 	}
+	// }
+	// //ctx.lineTo(points[array[0]].x, points[array[0]].y);
+
+	// ctx.stroke();
+	// ctx.closePath();
 }
 //画网格
 function drawGrid() {

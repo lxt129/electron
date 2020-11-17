@@ -10,7 +10,7 @@ layui.use(['element', 'layer', 'form'], function () {
     },
     progress: function (startTime) {
       //模拟loading
-      var totalTime = routeLenth / speed;
+      var totalTime = maxSubPath / speed;
       let timer = setInterval(function () {
         let time = new Date().getTime()
         n = (time - startTime) / totalTime / 10;

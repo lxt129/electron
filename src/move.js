@@ -14,7 +14,9 @@ let goTaskNumner = 0;
 let status = [];
 let estimatedTime = [];
 let timeSpent = [];
-
+let maxTime = 0;
+let taskDeviceIndex = -1;
+let isGoBack = false;
 
 let newAddRoute = [];
 let nextTarget = [];
@@ -47,12 +49,17 @@ function move(routes) {
 	taskSort = [];
 	taskStatusIndex = [];
 	goTaskNumner = 0;
+	taskDeviceIndex = -1;
+	isGoBack = false;
 	if(taskEquipment === 1){
 		speed = droneSpeed;
+		maxTime = droneMaxTime * 1000;
 	}else if(taskEquipment === 2){
 		speed = shipSpeed
+		maxTime = shipMaxTime * 1000;
 	}else{
 		speed = submarineSpeed;
+		maxTime = submarineMaxTiem * 1000;
 	}
 	if(taskType === 1){
 		sleep = surveyTime;
@@ -115,25 +122,37 @@ let end = 0;
 
 function startMove() {
 	for (let i = 0; i < routes.length; i++) {
+		let device;
+		if(taskEquipment === 1){
+			device = "无人机";
+		}else if(taskEquipment === 2){
+			device = "无人船";
+		}else{
+			device = "无人潜艇";
+		}
+
 		if(i < SALES_MEN){
-			$(eval('device'+i)).html(
+			$('#device'+i).html(
 				`
-				<p>探测无人机${i + 1}坐标(${~~(animatePoint[i].x)},${~~(animatePoint[i].y)})</p>
+				<p>探测${device}${i + 1}的坐标(${~~(animatePoint[i].x)},${~~(animatePoint[i].y)}),速度${speed},目标点坐标为(${routes[i][routes[i].length
+				 - 1].x},${routes[i][routes[i].length- 1].y})</p>
 				`
 				)
 		}else{
-			$(eval('device'+i)).html(
+			$('#device'+i).html(
 				`
-				<p>执行任务无人机${i+1}的坐标(${~~(animatePoint[i].x)},${~~(animatePoint[i].y)})</p>
+				<p>执行任务${device}${i+1}的坐标(${~~(animatePoint[i].x)},${~~(animatePoint[i].y)}),速度${speed},目标点坐标为(${routes[i][routes[i].length
+					- 1].x},${routes[i][routes[i].length- 1].y})</p>
 				`
 				)
 		}
-			
 		//------------------------------------------资源最少方案------------------------------------------
 		if(taskProgramme === 1){
 			//发现目标点后派出无人机 条件一 路径长度 > 1 条件2 上一个点是目标点 条件3 是否为最后一个点  条件4不是探测任务 
 			if (routes[i].length > 0 && routes[i][nextPointIndex[i] - 1].hasOwnProperty('isTarget') == true && nextPointIndex[i] == routes[i].length&& taskType !==1 && targetNum[i] < 3) {
+				//判断有多少个设备到达目标点
 				taskFalg++;
+				//到达目标点
 				if(targetNum[i] <= 1){
 					if(routes[i][nextPointIndex[i] - 1].isHit >= 0){
 						routes[i][nextPointIndex[i] - 1].isHit += 1
@@ -141,8 +160,12 @@ function startMove() {
 						routes[i][nextPointIndex[i] - 1].isSurround += 1
 					}
 				}
+				// 只能访问一次
 				targetNum[i] = targetNum[i] + 3;
-				if(taskFalg == newAddRoute.length){
+				console.log(i,taskFalg)
+				let k = taskType === 2 ? roundUpRequirement : attackRequirement;
+				//设备达到任务要求后执行任务
+				if(taskFalg == newAddRoute.length - taskDeviceIndex*k){
 					taskFalg = 0;
 					taskSort.push(routes[i][nextPointIndex[i] - 1])
 					setTimeout(function(){
@@ -158,8 +181,31 @@ function startMove() {
 				}
 				continue;
 			}
-
-			if(newAddRoute.length > 0 && taskFinish && nextTarget.length > 0){
+		
+			
+			// 任务完成后执行下一个任务
+			let key = taskType === 2 ? roundUpRequirement : attackRequirement;
+			let k;
+				if(taskType == 2){
+					k = roundUpRequirement;
+				}else{
+					k = attackRequirement;
+				}
+			if(i === routes.length - 1 && taskFinish && isGoBack == false){
+				let thisTime = new Date().getTime() - timeSpent[i] + distance(routes[i][routes[i].length - 1],routes[0][0])/speed*1000;
+				if(thisTime > maxTime){
+					console.log("!!!!")
+					while(k > 0){
+						//console.log(routes.length,key,k)
+						addRoute3(routes.length -k,routes[routes.length - k][routes[routes.length - k].length - 1],routes[0][0]);
+						k--;
+					}
+					isGoBack = true;
+				}
+				
+			}
+			//只让前一轮的设备进行判断
+			if(newAddRoute.length > 0 && taskFinish && nextTarget.length > 0 && i >= key*taskDeviceIndex + SALES_MEN && i < key*(taskDeviceIndex + 1) + SALES_MEN){
 				let point;
 				let t;
 				let minIndex = 0;
@@ -172,18 +218,50 @@ function startMove() {
 					}
 				}
 				point = nextTarget[minIndex];
-				for(let a = 0; a < newAddRoute.length; a++){
-					if(newAddRoute[a] === i && nextPointIndex[i] > routes[i].length - 1 && nextTarget.length > 0){
-						flag++;
-						addRoute3(newAddRoute[a],routes[newAddRoute[a]][routes[newAddRoute[a]].length -1],point);
-						targetNum[newAddRoute[a]] = 0;
+
+				let preTime = new Date().getTime() - timeSpent[i] + sleep + (distance(point,routes[i][routes[i].length - 1])+distance(point,routes[0][0]))/speed*1000;
+				console.log(i,preTime)
+				//超时
+				if(preTime > maxTime || isGoBack === true){
+					let a = -1;
+					let htmllet;
+					a = addRoute(point);
+					timeSpent[a] = new Date().getTime()
+					newAddRoute.push(a);
+					htmllet = `
+					<div id="device${a}" style="display:block;margin-top:5px"></div>
+					`;
+					$('#infoDiv').append(htmllet);
+					//判断上一轮是否全部结束任务
+					if(i == (taskDeviceIndex + 1)*k + SALES_MEN - 1){
+						//上一轮设备返回基地 
+						if(isGoBack === false){
+							while(k > 0){
+								//console.log(routes.length,key,k)
+								addRoute3(routes.length - key -k,routes[routes.length  - key - k][routes[routes.length  - key - k].length - 1],routes[0][0]);
+								k--;
+							}
+						}
+						taskFinish = false;	
+						taskDeviceIndex++;
+						nextTarget.splice(minIndex,1);
+						isGoBack = false
+					}
+				}else{//不超时
+					for(let a = taskDeviceIndex*k; a < (taskDeviceIndex + 1) * k ; a++){
+						if(newAddRoute[a] === i && nextPointIndex[i] > routes[i].length - 1 && nextTarget.length > 0){
+							flag++;
+							addRoute3(newAddRoute[a],routes[newAddRoute[a]][routes[newAddRoute[a]].length -1],point);
+							targetNum[newAddRoute[a]] = 0;
+						}
+					}
+					if(flag == k){
+						flag = 0;
+						nextTarget.splice(minIndex,1);
+						taskFinish = false;
 					}
 				}
-				if(flag == newAddRoute.length){
-					flag = 0;
-					nextTarget.splice(minIndex,1);
-					taskFinish = false;
-				}
+				
 			}
 		}else{
 		//------------------------------------------时间最少方案------------------------------------------
@@ -218,12 +296,11 @@ function startMove() {
 				//console.log(i,taskFalg,status[a])
 				//for(let a = 0;a < status.length;a++){
 					if(status[a] === true){
-						console.log(a)
+						//console.log(a)
 						status[a] = false;
 						taskStatusIndex.push(a);
 						taskSort.push(routes[i][nextPointIndex[i] - 1])
 						setTimeout(function(){
-							taskFinish = true;
 							if(taskType === 2){
 								taskSort[0].isSurround = 0;
 							}else{
@@ -232,12 +309,12 @@ function startMove() {
 							taskSort[0].isComplete = true;
 							taskSort.shift();
 							status[taskStatusIndex[0]] = true;
-							console.log("!!!!!!!!!!!!!!!!")
-							console.log(taskStatusIndex[0],status[taskStatusIndex[0]])
+							// console.log("!!!!!!!!!!!!!!!!")
+							// console.log(taskStatusIndex[0],status[taskStatusIndex[0]])
 							for(let b=0;b < status.length;b++){
 								console.log(b,status[b]);
 							}
-							console.log("!!!!!!!!!!!!!!!!")
+							//console.log("!!!!!!!!!!!!!!!!")
 							taskStatusIndex.shift();
 						},sleep) 
 					}
@@ -299,8 +376,10 @@ function startMove() {
 							<div id="device${a}" style="display:block;margin-top:5px"></div>
 							`;
 							$('#infoDiv').append(htmllet);
+							timeSpent[a] = new Date().getTime()
 							k = k - 1;
 						}
+						taskDeviceIndex++;
 					}else{
 						nextTarget.push(routes[i][nextPointIndex[i] - 1]);	
 					}
@@ -319,8 +398,10 @@ function startMove() {
 							<div id="device${a}" style="display:block;margin-top:5px"></div>
 							`;
 							$('#infoDiv').append(htmllet);
+							timeSpent[a] = new Date().getTime()
 							k = k - 1;
 						}
+						taskDeviceIndex++;
 					}else{
 						nextTarget.push(routes[i][nextPointIndex[i] - 1]);	
 					}
@@ -335,6 +416,13 @@ function startMove() {
 					routes[i][nextPointIndex[i] - 1].isSurround = 0;
 					targetPointSurround.push(routes[i][nextPointIndex[i] - 1]);
 					let k = roundUpRequirement;
+
+					if(status[0] === true){
+						let thisTime = new Date().getTime() - timeSpent[i] + distance(routes[i][routes[i].length - 1],routes[0][0])/speed*1000;
+					}
+					
+
+					//第一个目标直接派出无人机
 					if(target === 1){
 						let a = -1;
 						let htmllet;
@@ -346,10 +434,11 @@ function startMove() {
 							`;
 							$('#infoDiv').append(htmllet);
 							k = k - 1;
+							timeSpent[a] = new Date().getTime()
 						}
 						status[goTaskNumner] = false;
 						goTaskNumner++;
-					}else{
+					}else{//第一个目标以后的目标
 						let key = false;
 						nextTarget.push(routes[i][nextPointIndex[i] - 1]);
 						let point = nextTarget[nextTarget.length - 1];
@@ -357,6 +446,7 @@ function startMove() {
 						let indexSelect = -1;
 						let x;
 						let t;
+						//判断从现有点出发哪里最近
 						for(let a = 0;a < status.length; a++){
 							if(status[a] === true){
 								x = a;
@@ -366,18 +456,30 @@ function startMove() {
 									min = t;
 									indexSelect = x;
 									key = true;
-								}
-								
+								} 
 							}
 						}
-						for(let a = 0;a < SALES_MEN;a++){
-							t = distance(routes[a][0],point);
-							if(t < min){
-								min = t;
-								indexSelect = a;
+						if(key === true){
+							let thisIndex = indexSelect * roundUpRequirement + SALES_MEN
+							let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed*1000;;
+							console.log(thisTime)
+							if(thisTime > maxTime){
 								key = false;
 							}
+							console.log("!!!!")
 						}
+
+						//判断是否从基地出发最近
+						t = distance(routes[0][0],point);
+						if(t < min && key){
+							min = t;
+							indexSelect = 0;
+							key = false;
+						}else{
+							indexSelect = 0;
+						}
+						
+						//从基地派出新的设备
 						if(key === false){
 							let a = -1;
 							let htmllet;
@@ -389,9 +491,10 @@ function startMove() {
 								`;
 								$('#infoDiv').append(htmllet);
 								k = k - 1;
+								timeSpent[a] = new Date().getTime()
 							}
 							status[status.length] = false;
-						}else{
+						}else{//就近派出的设备
 							let c = indexSelect ;
 							a = indexSelect * roundUpRequirement + SALES_MEN
 							for(let b = 0;b < roundUpRequirement; b++){
@@ -440,16 +543,13 @@ function startMove() {
 									indexSelect = x;
 									key = true;
 								}
-								
 							}
 						}
-						for(let a = 0;a < SALES_MEN;a++){
-							t = distance(routes[a][0],point);
-							if(t < min){
-								min = t;
-								indexSelect = a;
-								key = false;
-							}
+						t = distance(routes[0][0],point);
+						if(t < min){
+							min = t;
+							indexSelect = 0;
+							key = false;
 						}
 						if(key === false){
 							let a = -1;
@@ -656,7 +756,7 @@ function changeRoute(index, currentPoint) {
 function addRoute(targetPoint) {
 	let min = 9999999;
 	let res = -1;
-	for (var i = 0; i < SALES_MEN; i++) {
+	for (var i = 0; i < 1; i++) {
 		if (min > distance(points[i], targetPoint)) {
 			min = distance(points[i], targetPoint);
 			res = i;
