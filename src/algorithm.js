@@ -310,9 +310,9 @@ function wheelOut(rand) {
 //生成随机序列[10,1,4,5,6,3,7,8,2,9] 前n个旅行商为分割点为分割点
 function randomIndivial(n) {
 	var a = [];
-	// for(var i=1; i<SALES_MEN; i++) //三个旅行商只需要2个0分为三段
-	//  a.push(0);
-	for (var i = 0; i < n; i++) {
+	for(var i=1; i<SALES_MEN; i++) //三个旅行商只需要2个0分为三段
+		a.push(0);
+	for(var i=0; i<n; i++) {
 		a.push(i);
 	}
 	return a.shuffle();
@@ -320,41 +320,20 @@ function randomIndivial(n) {
 
 //评价个体
 function evaluate(indivial) {
-	//每段距离的初始值
 	var sumForSalesman = new Array(SALES_MEN).fill(0);
-	//当前路径起点
-	var currentStartPoint = -1;
-	//当前是第几段路径
-	var currentPart = 0;
-	//移动数组index
-	var index = -1;
-	for (var i = 0; i < indivial.length; i++) {
-		if (indivial[i] < SALES_MEN) {
-			currentStartPoint = indivial[i];
-			index = i;
-			var frontIndivial = indivial.slice(0, index);
-			break;
-		}
-	}
-	indivial = indivial.slice(index).concat(frontIndivial); //让路径变为[0....1.....2....],方便计算路程
-	currentStartPoint = indivial[0];
-	for (var i = 1; i < indivial.length; i++) {
-		if (indivial[i] < SALES_MEN) {
-			sumForSalesman[currentPart] += dis[indivial[i - 1]][currentStartPoint];
-			currentStartPoint = indivial[i];
-			currentPart = currentPart + 1;
-		} else {
-			sumForSalesman[currentPart] += dis[indivial[i - 1]][indivial[i]];
-		}
-	}
-	//添加最后一个点到它的起始位置的距离
-	sumForSalesman[currentPart] += dis[indivial[indivial.length - 1]][currentStartPoint];
-	var sum = 0;
-	for (var i = 0; i < sumForSalesman.length; i++) {
-		sum += sumForSalesman[i];
-	}
+	var currentSalesmanIndex = 0;
+	var sum = dis[indivial[0]][indivial[indivial.length - 1]];
+	sumForSalesman[currentSalesmanIndex] = sum;
+	if(indivial[0] == 0)
+		currentSalesmanIndex = (currentSalesmanIndex + 1) % SALES_MEN;
 
-	var L2 = sumForSalesman.reduce((t, x) => t + x * x, 0);
+	for(var i=1; i<indivial.length; i++) {
+		sum += dis[indivial[i]][indivial[i-1]];
+		sumForSalesman[currentSalesmanIndex] += dis[indivial[i]][indivial[i-1]];
+		if(indivial[i] == 0)
+		currentSalesmanIndex = (currentSalesmanIndex + 1) % SALES_MEN;
+	}
+	var L2 = sumForSalesman.reduce((t, x) => t + x*x, 0);
 	return L2 / sum; // returns larger values for unfair distribution of distances between salesmen.
 }
 

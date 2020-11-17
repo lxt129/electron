@@ -36,6 +36,7 @@ var currentBest;
 var population;
 var values;
 var routeLenth;
+var maxSubPath;
 var fitnessValues;
 var roulette;
 
@@ -60,13 +61,13 @@ var roundUpRescue = 999;//围捕资源数量
 var attackRescue = 999;//打击资源数量
 
 var droneSpeed = 200; //无人机速度
-var droneMaxTime = 10000; //无人机最大运动时间
+var droneMaxTime = 10; //无人机最大运动时间
 var droneMaxLoad = 2;  //无人机最大负载
 var shipSpeed = 200; //无人船速度
-var shipMaxTime = 10000; //无人船最大运动时间
+var shipMaxTime = 10; //无人船最大运动时间
 var shipMaxLoad = 2;  //无人船最大负载
 var submarineSpeed = 200; //无人潜艇速度
-var submarineMaxTiem = 10000; //无人潜艇最大运动时间
+var submarineMaxTiem = 10; //无人潜艇最大运动时间
 var submarineMaxLoad = 2;  //无人潜艇最大负载
 
 
@@ -87,7 +88,6 @@ var taskType = 1; //任务类型（1探测、2围捕、3打击）
 
 
 $(function() {
-	
 	init();
 	initData();
 	
@@ -137,6 +137,7 @@ $(function() {
 });
 
 function MoveProgress(){
+	maxSubPath = getMaxSubPath(best,SALES_MEN)
 	let htmllet = `
 	<div id="progress">
 		<p>探测任务执行进度</p>
@@ -185,14 +186,14 @@ function MoveProgress(){
 		} else {
 			var index = -1;
 			for (var i = 0; i < best.length; i++) {
-				if (best[i] < SALES_MEN) {
+				if (best[i] <= 0) {
 					index = i;
 					break;
 				}
 			}
 			var newBest = best.slice(index, best.length).concat(best.slice(0, index));
 			for (var i = 0, j = -1; i < newBest.length; i++) {
-				if (newBest[i] < SALES_MEN) {
+				if (newBest[i] <= 0) {
 					if (j >= 0) {
 						routes[j].push(points[newBest[routesIndex[j]]]);
 					}
@@ -215,7 +216,7 @@ function MoveProgress(){
 //初始化数据
 function initData() {
 	running = false; // 控制程序运行
-	POPULATION_SIZE = 200; //种群大小
+	POPULATION_SIZE = 100; //种群大小
 	ELITE_RATE = 0.3; //精英率
 	CROSSOVER_PROBABILITY = 0.9; //交叉概率
 	hitung_u(); //
@@ -261,7 +262,7 @@ function addRandomPoints(number) {
 		}
 	}
 	if (points.length == number) {
-		for (var i = 0; i < SALES_MEN; i++) {
+		for (var i = 0; i < 1; i++) {
 			points[i].isCenter = true;
 		}
 	}
@@ -311,38 +312,10 @@ function draw() {
 	}
 	if (points.length > 0) {
 		for (var i = 0; i < points.length; i++) {
-			drawCircle(points[i]);
+		  drawCircle(points[i]);
 		}
-
-		var drawBest = best.clone();
-		var statPoint = [];
-		var index = -1;
-		for (var i = 0; i < drawBest.length; i++) {
-			if (drawBest[i] < SALES_MEN) {
-				currentStartPoint = drawBest[i];
-				index = i;
-				var frontIndivial = drawBest.slice(0, index);
-				break;
-			}
-		}
-		drawBest = drawBest.slice(index).concat(frontIndivial);
-
-		if (running || currentGeneration !== 0) {
-			var index = drawBest[0];
-			for (var i = 1; i < drawBest.length; i++) {
-				if (drawBest[i] < SALES_MEN) {
-					drawBest.splice(i, 0, index);
-					i++;
-					index = drawBest[i];
-				}
-			}
-			drawBest.push(index);
-		}
-		if (drawHidden) {
-			drawAvoidHidden(drawBest);
-		} else if (drawBest.length === (points.length + SALES_MEN) && drawBest.length !== 0) {
-			//console.log("QQQ");
-			drawLines(drawBest);
+		if (best.length - SALES_MEN + 1 === points.length) {
+		  drawLines(best);
 		}
 	}
 	drawTargetPoint();
