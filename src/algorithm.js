@@ -1,3 +1,30 @@
+// var running; //控制是否开始
+// var POPULATION_SIZE; //总群大小
+// var CROSSOVER_PROBABILITY; //交叉率
+// var MUTATION_PROBABILITY; //变异率
+// var UNCHANGED_GENS; //已有几代没有发生变化
+// var mutationTimes; //变异次数
+// var dis;  	//计算每两个点之间的距离
+// var bestValue, best; //最佳评价值  最佳路径(best)
+// var currentGeneration;//当前是第几代
+// var currentBest; // 当代最佳
+// var population; // 存放总群的数组
+// var values;   
+// var routeLenth; //轮盘长度
+// var maxSubPath; //最长子路径
+// var fitnessValues; //适应度
+// var roulette; //轮盘
+
+// var titik1_pop = 0;
+// var titik2_pop = 70;
+// var titik3_pop = 150;
+// var titik1_sales = 0;
+// var titik2_sales = 5;
+// var titik3_sales = 10;
+// var titik1_mut = 0;
+// var titik2_mut = 0.002;
+// var titik3_mut = 0.01;
+
 //计算变异率
 function popKecil() {
 	if (POPULATION_SIZE >= titik1_pop && POPULATION_SIZE <= titik2_pop) { // [0,75]

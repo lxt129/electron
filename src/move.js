@@ -12,11 +12,13 @@ let type = [];
 let speed = 200;
 let goTaskNumner = 0;
 let status = [];
+let load = [];
 let estimatedTime = [];
 let timeSpent = [];
 let maxTime = 0;
 let taskDeviceIndex = -1;
 let isGoBack = false;
+let resource = 0;
 
 let newAddRoute = [];
 let nextTarget = [];
@@ -37,6 +39,7 @@ let drone = 0;
 
 function move(routes) {
 	status = [];
+	load = [];
 	drone = 0;
 	target = 0;
 	newAddRoute = [];
@@ -54,12 +57,15 @@ function move(routes) {
 	if(taskEquipment === 1){
 		speed = droneSpeed;
 		maxTime = droneMaxTime * 1000;
+		resource = droneMaxLoad;
 	}else if(taskEquipment === 2){
 		speed = shipSpeed
 		maxTime = shipMaxTime * 1000;
+		resource = shipMaxLoad;
 	}else{
 		speed = submarineSpeed;
 		maxTime = submarineMaxTiem * 1000;
+		resource = submarineMaxLoad;
 	}
 	if(taskType === 1){
 		sleep = surveyTime;
@@ -67,6 +73,7 @@ function move(routes) {
 		sleep = roundUpTime;
 	}else{
 		sleep = attackTime;
+
 	}
 	for (var i = 0; i < SALES_MEN; i++) {
 		var point = new Point(routes[i][0].x, routes[i][0].y);
@@ -177,6 +184,9 @@ function startMove() {
 						}
 						taskSort[0].isComplete = true;
 						taskSort.shift();
+						if(taskType === 3){
+							load[taskDeviceIndex] = load[taskDeviceIndex] - 2;
+						}
 					},sleep,i) 
 				}
 				continue;
@@ -186,12 +196,15 @@ function startMove() {
 			// 任务完成后执行下一个任务
 			let key = taskType === 2 ? roundUpRequirement : attackRequirement;
 			let k;
-				if(taskType == 2){
-					k = roundUpRequirement;
-				}else{
-					k = attackRequirement;
-				}
+			if(taskType == 2){
+				k = roundUpRequirement;
+			}else{
+				k = attackRequirement;
+			}
+			
+			//超时回家 或者 没资源回家
 			if(i === routes.length - 1 && taskFinish && isGoBack == false){
+				console.log("!!!!!!!!!!!!")
 				let thisTime = new Date().getTime() - timeSpent[i] + distance(routes[i][routes[i].length - 1],routes[0][0])/speed*1000;
 				if(thisTime > maxTime){
 					console.log("!!!!")
@@ -201,9 +214,20 @@ function startMove() {
 						k--;
 					}
 					isGoBack = true;
+					console.log(load[taskDeviceIndex] )
+				}else if(load[taskDeviceIndex] < 2 && taskType === 3){
+					console.log("taskDeviceIndex",taskDeviceIndex)
+					while(k > 0){
+						console.log(routes.length,key,k)
+						console.log("!!!!")
+						addRoute3(routes.length -k,routes[routes.length - k][routes[routes.length - k].length - 1],routes[0][0]);
+						k--;
+					}
+					isGoBack = true;
 				}
 				
 			}
+
 			//只让前一轮的设备进行判断
 			if(newAddRoute.length > 0 && taskFinish && nextTarget.length > 0 && i >= key*taskDeviceIndex + SALES_MEN && i < key*(taskDeviceIndex + 1) + SALES_MEN){
 				let point;
@@ -220,30 +244,35 @@ function startMove() {
 				point = nextTarget[minIndex];
 
 				let preTime = new Date().getTime() - timeSpent[i] + sleep + (distance(point,routes[i][routes[i].length - 1])+distance(point,routes[0][0]))/speed*1000;
-				console.log(i,preTime)
-				//超时
-				if(preTime > maxTime || isGoBack === true){
-					let a = -1;
-					let htmllet;
-					a = addRoute(point);
-					timeSpent[a] = new Date().getTime()
-					newAddRoute.push(a);
-					htmllet = `
-					<div id="device${a}" style="display:block;margin-top:5px"></div>
-					`;
-					$('#infoDiv').append(htmllet);
+
+				//超时或者资源不够  资源不够最后一个目标为起点也不执行
+				if(preTime > maxTime || isGoBack === true || load[taskDeviceIndex] < 2){
+					if(point !== routes[0][0]){
+						let a = -1;
+						let htmllet;
+						a = addRoute(point);
+						timeSpent[a] = new Date().getTime()
+						newAddRoute.push(a);
+						htmllet = `
+						<div id="device${a}" style="display:block;margin-top:5px"></div>
+						`;
+						$('#infoDiv').append(htmllet);
+					}
+					
 					//判断上一轮是否全部结束任务
 					if(i == (taskDeviceIndex + 1)*k + SALES_MEN - 1){
 						//上一轮设备返回基地 
 						if(isGoBack === false){
 							while(k > 0){
-								//console.log(routes.length,key,k)
 								addRoute3(routes.length - key -k,routes[routes.length  - key - k][routes[routes.length  - key - k].length - 1],routes[0][0]);
 								k--;
 							}
 						}
 						taskFinish = false;	
 						taskDeviceIndex++;
+						if(taskType === 3){
+							load[taskDeviceIndex] = resource * attackRequirement;
+						}
 						nextTarget.splice(minIndex,1);
 						isGoBack = false
 					}
@@ -265,7 +294,7 @@ function startMove() {
 			}
 		}else{
 		//------------------------------------------时间最少方案------------------------------------------
-			//发现目标点后派出无人机 条件一 路径长度 > 1 条件2 上一个点事目标点  条件3 不是探测任务 
+			//发现目标点后派出无人机，到达目标点 条件一 路径长度 > 1 条件2 上一个点事目标点  条件3 不是探测任务 
 			if (routes[i].length > 0 && routes[i][nextPointIndex[i] - 1].hasOwnProperty('isTarget') == true && nextPointIndex[i] == routes[i].length&& taskType !==1 && targetNum[i] < 3) {
 				
 				taskFalg++;
@@ -309,6 +338,7 @@ function startMove() {
 							taskSort[0].isComplete = true;
 							taskSort.shift();
 							status[taskStatusIndex[0]] = true;
+							load[taskStatusIndex[0]] = load[taskStatusIndex[0]] - 2;
 							// console.log("!!!!!!!!!!!!!!!!")
 							// console.log(taskStatusIndex[0],status[taskStatusIndex[0]])
 							for(let b=0;b < status.length;b++){
@@ -343,6 +373,46 @@ function startMove() {
 							addRoute3(e + b,routes[e + b][routes[e + b].length -1],routes[0][0]);
 						}
 						status[d] = false;
+					}
+				}
+			}
+			//时间到了回基地
+			for(let a = 0;a < status.length; a++){
+				let c;
+				c =  taskType === 2 ? roundUpRequirement : attackRequirement;
+				let d;
+				let e;
+				if(status[a] === true){
+					d = a;
+					e = a*c + SALES_MEN;
+					let thisTime = new Date().getTime() - timeSpent[e] + +distance(routes[e][routes[e].length - 1],routes[0][0])/speed*1000;
+					if(thisTime > maxTime){
+						for(let b = 0;b < c;b++){
+							addRoute3(e + b,routes[e + b][routes[e + b].length -1],routes[0][0]);
+						}
+						status[d] = false;
+					}
+					
+				}
+			}
+
+			//打击资源没有了，回基地
+			if(taskType === 3){
+				for(let a = 0;a < status.length; a++){
+					let c;
+					c =  taskType === 2 ? roundUpRequirement : attackRequirement;
+					let d;
+					let e;
+					if(status[a] === true){
+						d = a;
+						e = a*c + SALES_MEN;
+						if(load[a] < 2){
+							for(let b = 0;b < c;b++){
+								addRoute3(e + b,routes[e + b][routes[e + b].length -1],routes[0][0]);
+							}
+							status[d] = false;
+						}
+						
 					}
 				}
 			}
@@ -398,10 +468,11 @@ function startMove() {
 							<div id="device${a}" style="display:block;margin-top:5px"></div>
 							`;
 							$('#infoDiv').append(htmllet);
-							timeSpent[a] = new Date().getTime()
+							timeSpent[a] = new Date().getTime();
 							k = k - 1;
 						}
 						taskDeviceIndex++;
+						load[taskDeviceIndex] = resource * attackRequirement;
 					}else{
 						nextTarget.push(routes[i][nextPointIndex[i] - 1]);	
 					}
@@ -449,19 +520,18 @@ function startMove() {
 						//判断从现有点出发哪里最近
 						for(let a = 0;a < status.length; a++){
 							if(status[a] === true){
-								x = a;
-								a = a * roundUpRequirement + SALES_MEN
-								t = distance(routes[a][routes[a].length -1],point)
+								x = a * roundUpRequirement + SALES_MEN
+								t = distance(routes[x][routes[x].length -1],point);
 								if(t < min){
 									min = t;
-									indexSelect = x;
+									indexSelect = a;
 									key = true;
 								} 
 							}
 						}
 						if(key === true){
 							let thisIndex = indexSelect * roundUpRequirement + SALES_MEN
-							let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed*1000;;
+							let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed*1000;
 							console.log(thisTime)
 							if(thisTime > maxTime){
 								key = false;
@@ -494,6 +564,7 @@ function startMove() {
 								timeSpent[a] = new Date().getTime()
 							}
 							status[status.length] = false;
+							load[status.length] = resource * roundUpRequirement;
 						}else{//就近派出的设备
 							let c = indexSelect ;
 							a = indexSelect * roundUpRequirement + SALES_MEN
@@ -511,6 +582,7 @@ function startMove() {
 					routes[i][nextPointIndex[i] - 1].isHit = 0;
 					targetPointHit.push(routes[i][nextPointIndex[i] - 1]);
 					let k = attackRequirement;
+
 					if(target === 1){
 						let a = -1;
 						let htmllet;
@@ -521,9 +593,11 @@ function startMove() {
 							<div id="device${a}" style="display:block;margin-top:5px"></div>
 							`;
 							$('#infoDiv').append(htmllet);
+							timeSpent[a] = new Date().getTime()
 							k = k - 1;
 						}
 						status[goTaskNumner] = false;
+						load[goTaskNumner] = resource * attackRequirement;
 						goTaskNumner++;
 					}else{
 						let key = false;
@@ -534,16 +608,25 @@ function startMove() {
 						let x;
 						let t;
 						for(let a = 0;a < status.length; a++){
-							if(status[a] === true){
-								x = a;
-								a = a * attackRequirement + SALES_MEN
-								t = distance(routes[a][routes[a].length -1],point)
+							if(status[a] === true && load[a] >= 2){
+								x = a * attackRequirement + SALES_MEN
+								t = distance(routes[x][routes[x].length -1],point)
 								if(t < min){
 									min = t;
-									indexSelect = x;
+									indexSelect = a;
 									key = true;
 								}
 							}
+						}
+
+						if(key === true){
+							let thisIndex = indexSelect * attackRequirement + SALES_MEN
+							let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed*1000;
+							console.log(thisTime)
+							if(thisTime > maxTime){
+								key = false;
+							}
+							console.log("!!!!")
 						}
 						t = distance(routes[0][0],point);
 						if(t < min){
@@ -561,6 +644,7 @@ function startMove() {
 								<div id="device${a}" style="display:block;margin-top:5px"></div>
 								`;
 								$('#infoDiv').append(htmllet);
+								timeSpent[a] = new Date().getTime()
 								k = k - 1;
 							}
 							status[status.length] = false;

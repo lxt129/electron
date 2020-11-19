@@ -65,9 +65,9 @@ layui.use(['layer','form'], function(){
     var resDom =  `
     <form class="layui-form" style="padding: 10px;" action="" style="margin: 20px 0;">
         <div class="layui-form-item">
-            <label class="layui-form-label">任务的基地个数</label>
+            <label class="layui-form-label">无人平台数量</label>
             <div class="layui-input-block">
-                <input type="text" name="base" lay-verify="number" autocomplete="off" class="layui-input">
+                <input type="text" name="total" lay-verify="number" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
@@ -120,7 +120,7 @@ layui.use(['layer','form'], function(){
             ,resize:false
             ,success: function(layero, index){
                 form.render();
-                $('input[name="base"]').val(SALES_MEN);
+                $('input[name="total"]').val(total);
                 $('input[name="drones"]').val(drones);
                 $('input[name="ship"]').val(ship);
                 $('input[name="submarine"]').val(submarine);
@@ -132,7 +132,7 @@ layui.use(['layer','form'], function(){
             ,btn: ['确认', '重置']
             ,yes: function(index, layero){
                 $('#status').text("");
-                SALES_MEN = Number($('input[name="base"]').val());
+                total = Number($('input[name="total"]').val());
                 drones = Number($('input[name="drones"]').val());
                 ship = Number($('input[name="ship"]').val());
                 submarine = Number($('input[name="submarine"]').val());
@@ -144,9 +144,9 @@ layui.use(['layer','form'], function(){
             }
             ,btn2: function(index, layero){
                 $('#status').text("");
-                $('input[name="base"]').val(1);
-                $('input[name="drones"]').val(10);
-                $('input[name="ship"]').val(10);
+                $('input[name="total"]').val(10);
+                $('input[name="drones"]').val(0);
+                $('input[name="ship"]').val(0);
                 $('input[name="submarine"]').val(10);
                 $('input[name="surveyRescue"]').val(10);
                 $('input[name="roundUpRescue"]').val(10);
