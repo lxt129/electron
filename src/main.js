@@ -53,21 +53,22 @@ var titik3_mut = 0.01;
 
 //-------------------用户设定的参数-------------------
 var SALES_MEN = 1; //基地个数
+var total = 10;  //总数
 var drones = 10; //无人机个数
-var ship = 10; //无人船个数
-var submarine = 10;//无人潜艇
+var ship = 0; //无人船个数
+var submarine = 0;//无人潜艇
 var surveyRescue = 999;//探测资源数量
 var roundUpRescue = 999;//围捕资源数量
 var attackRescue = 999;//打击资源数量
 
 var droneSpeed = 200; //无人机速度
-var droneMaxTime = 10; //无人机最大运动时间
+var droneMaxTime = 15; //无人机最大运动时间
 var droneMaxLoad = 2;  //无人机最大负载
 var shipSpeed = 200; //无人船速度
-var shipMaxTime = 10; //无人船最大运动时间
+var shipMaxTime = 15; //无人船最大运动时间
 var shipMaxLoad = 2;  //无人船最大负载
 var submarineSpeed = 200; //无人潜艇速度
-var submarineMaxTiem = 10; //无人潜艇最大运动时间
+var submarineMaxTiem = 15; //无人潜艇最大运动时间
 var submarineMaxLoad = 2;  //无人潜艇最大负载
 
 
@@ -101,6 +102,15 @@ $(function() {
 		if (points.length >= 3) {
 			initData();
 			GAInitialize();
+			// while(currentGeneration <= 1000){
+			// 	GANextGeneration();
+			// }
+			// //判断大致需要的无人设备数量
+			// SALES_MEN = Math.ceil(routeLenth/(droneSpeed * (droneMaxTime*0.8)));
+			// console.log(SALES_MEN)
+			// initData();
+			// GAInitialize();
+			//continue;
 			running = true;
 			drawHidden = false;
 		} else {
@@ -131,6 +141,12 @@ $(function() {
 		drawAvoidHidden(best);
 	})
 	$('#move').click(function() {
+		running = false;
+		let max = getMaxSubPath(best,SALES_MEN)
+		console.log(max,droneSpeed * droneMaxTime)
+		if(max > droneSpeed * droneMaxTime){
+			alert("有路径超过最航行时间！")
+		}
 		$("#infoDiv").empty();
 		tools.messageComfirm()
 	})
@@ -156,14 +172,14 @@ function MoveProgress(){
 		drone = 0; //无人机数
 		$('#info').val('');
 		addinfo("巡查任务开始...");
-		for (var i = 0; i < 5; i++) {
+		for (var i = 0; i < 3; i++) {
 			var rand = randomNumber(points.length);
 			if(rand < SALES_MEN){
 				rand = randomNumber(points.length);
 			}
 			points[rand].isTargetUnfind = true;
 		}
-		running = false;
+		
 		routes = [];
 		for (var i = 0; i < SALES_MEN; i++) {
 			routes[i] = new Array();

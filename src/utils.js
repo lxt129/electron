@@ -110,41 +110,23 @@ function routeDistance(route){
 
 
 function getMaxSubPath(indivial,SALES_MEN) {
-	//每段距离的初始值
 	var sumForSalesman = new Array(SALES_MEN).fill(0);
-	//当前路径起点
-	var currentStartPoint = -1;
-	//当前是第几段路径
-	var currentPart = 0;
-	//移动数组index
-	var index = -1;
-	for (var i = 0; i < indivial.length; i++) {
-		if (indivial[i] < SALES_MEN) {
-			currentStartPoint = indivial[i];
-			index = i;
-			var frontIndivial = indivial.slice(0, index);
-			break;
-		}
-	}
-	indivial = indivial.slice(index).concat(frontIndivial); //让路径变为[0....1.....2....],方便计算路程
-	currentStartPoint = indivial[0];
-	for (var i = 1; i < indivial.length; i++) {
-		if (indivial[i] < SALES_MEN) {
-			sumForSalesman[currentPart] += dis[indivial[i - 1]][currentStartPoint];
-			currentStartPoint = indivial[i];
-			currentPart = currentPart + 1;
-		} else {
-			sumForSalesman[currentPart] += dis[indivial[i - 1]][indivial[i]];
-		}
-	}
-	//添加最后一个点到它的起始位置的距离
-	sumForSalesman[currentPart] += dis[indivial[indivial.length - 1]][currentStartPoint];
-	var max = 0;
-	for (var i = 0; i < sumForSalesman.length; i++) {
-		if(max < sumForSalesman[i]){
-			max = sumForSalesman[i];
-		}
-	}
+	var currentSalesmanIndex = 0;
+	var sum = dis[indivial[0]][indivial[indivial.length - 1]];
+	sumForSalesman[currentSalesmanIndex] = sum;
+	if(indivial[0] == 0)
+		currentSalesmanIndex = (currentSalesmanIndex + 1) % SALES_MEN;
 
-	return max; // returns larger values for unfair distribution of distances between salesmen.
+	for(var i=1; i<indivial.length; i++) {
+		sum += dis[indivial[i]][indivial[i-1]];
+		sumForSalesman[currentSalesmanIndex] += dis[indivial[i]][indivial[i-1]];
+		if(indivial[i] == 0)
+		currentSalesmanIndex = (currentSalesmanIndex + 1) % SALES_MEN;
+	}
+	let max = 0;
+	for(let i = 0;i < sumForSalesman.length;i++){
+		if(max < sumForSalesman[i])
+			max = sumForSalesman[i];
+	}
+	return max;
 }
