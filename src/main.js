@@ -85,7 +85,7 @@ var taskEquipment = 1;//任务设备
 var taskType = 1; //任务类型（1探测、2围捕、3打击）
 // var hitRate = 50
 // var surroundRate = 35
-
+var tableData = [];
 
 
 $(function() {
@@ -149,6 +149,12 @@ $(function() {
 		}
 		$("#infoDiv").empty();
 		tools.messageComfirm()
+		//添加任务
+		for(let i=0;i < total; i++){
+			tableData[i].taskType = taskType;
+			tableData[i].currentPosition = "("+~~(points[0].x) +","+~~(points[0].y)+")";
+		}
+		tools.initTable();
 	})
 });
 
@@ -337,4 +343,36 @@ function draw() {
 	drawTargetPoint();
 }
 
+
+//初始化数据表格
+function initTableData(){
+	console.log("!!!")
+	let i = 0;
+	for(i;i < drones;i++){
+		var deviceInfo = new info(i + 1,"无人机",null,null,droneMaxTime,null,droneMaxLoad,droneMaxTime,null,"未启用");
+		tableData.push(deviceInfo);
+	}
+	for(i;i< drones + ship;i++){
+		var deviceInfo = new info(i + 1,"无人船",null,null,shipMaxTime,null,shipMaxLoad,shipMaxTime,null,"未启用");
+		tableData.push(deviceInfo);
+	}
+	for(i;i< drones + ship + submarine;i++){
+		var deviceInfo = new info(i + 1,"无人潜艇",null,null,submarineMaxTiem,null,submarineMaxLoad,submarineMaxTiem,null,"未启用");
+		tableData.push(deviceInfo);
+	}
+	tools.initTable();
+}
+
+function info(id,type,target,taskType,speed,currentPosition,load,spendTime,timeLeft,status){
+	this.id = id;
+	this.type = type;
+	this.target = target;
+	this.taskType = taskType;
+	this.speed = speed;
+	this.currentPosition = currentPosition;
+	this.load = load;
+	this.spendTime = spendTime;
+	this.timeLeft = timeLeft;
+	this.status = status;
+}
 

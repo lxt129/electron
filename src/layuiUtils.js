@@ -1,7 +1,8 @@
-layui.use(['element', 'layer', 'form'], function () {
+layui.use(['element', 'layer', 'form','table'], function () {
   var element = layui.element;
   var layer = layui.layer;
   var form = layui.form;
+  var table = layui.table;
   var $ = layui.$;
   var _tools = {
     startProgress: function () {
@@ -14,12 +15,12 @@ layui.use(['element', 'layer', 'form'], function () {
       let timer = setInterval(function () {
         let time = new Date().getTime()
         n = (time - startTime) / totalTime / 10;
-        if (n > 100) {
-          n = 100;
+        if (n > 90) {
+          n = 90;
           clearInterval(timer);
         }
         element.progress('progress', n + '%');
-      }, 1000);
+      }, 900);
     },
     messageComfirm: function () {
       var comfirmDom = `
@@ -73,7 +74,93 @@ layui.use(['element', 'layer', 'form'], function () {
         layer.closeAll(); //疯狂模式，关闭所有层
       }
       });
+    },
+
+    initTable: function(){
+      //console.log(JSON.parse(data))
+      table.render({
+        elem: '#table'
+        ,height: 490
+        ,data: tableData //数据接口
+        ,page: true //开启分页
+        ,cols: [[ //表头
+          {
+            field: 'id', 
+            title: '编号',
+            align: 'center',
+            width:'65'
+          },
+          {
+            field: 'type', 
+            title: '设备种类',
+            align: 'center',
+            width:'90'
+          },
+          {
+            field: 'target', 
+            title: '目标',
+            align: 'center',
+            width:'90'
+          },
+          {
+            field: 'taskType', 
+            title: '任务类型',
+            align: 'center',
+            width:'88',
+            templet: function(d){
+              if(d.taskType == 1){
+                return "探测";
+              }else if(d.taskType == 2){
+                return "围捕";
+              }else if(d.taskType == 3){
+                return "打击";
+              }else{
+                return "";
+              }
+            }
+          },
+          {
+            field: 'speed', 
+            title: '速度',
+            align: 'center',
+            width:'63'
+          },
+          {
+            field: 'currentPosition', 
+            title: '当前位置',
+            align: 'center',
+            width:'90'
+          },
+          {
+            field: 'load', 
+            title: '负载',
+            align: 'center',
+            width:'63'
+          },
+          {
+            field: 'spendTime', 
+            title: '时间',
+            align: 'center',
+            width:'63'
+          },
+          {
+            field: 'timeLeft', 
+            title: '剩余时间',
+            align: 'center',
+            width:'87'
+          },
+          {
+            field: 'status', 
+            title: '状态',
+            align: 'center',
+            width:'77'
+          },
+        ]]
+      });
     }
+    
+
   }
   window.tools = _tools;
+  initTableData()
 });

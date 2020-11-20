@@ -54,6 +54,9 @@ function move(routes) {
 	goTaskNumner = 0;
 	taskDeviceIndex = -1;
 	isGoBack = false;
+	for(let i = 0;i < SALES_MEN;i++){
+		timeSpent[i] = new Date().getTime();
+	}
 	if(taskEquipment === 1){
 		speed = droneSpeed;
 		maxTime = droneMaxTime * 1000;
@@ -129,29 +132,23 @@ let end = 0;
 
 function startMove() {
 	for (let i = 0; i < routes.length; i++) {
-		let device;
-		if(taskEquipment === 1){
-			device = "无人机";
-		}else if(taskEquipment === 2){
-			device = "无人船";
-		}else{
-			device = "无人潜艇";
-		}
-
+		tableData[i].currentPosition = "("+~~(animatePoint[i].x) +","+~~(animatePoint[i].y)+")";
 		if(i < SALES_MEN){
-			$('#device'+i).html(
-				`
-				<p>探测${device}${i + 1}的坐标(${~~(animatePoint[i].x)},${~~(animatePoint[i].y)}),速度${speed},目标点坐标为(${routes[i][routes[i].length
-				 - 1].x},${routes[i][routes[i].length- 1].y})</p>
-				`
-				)
+			tableData[i].target = "("+~~(routes[0][0].x) +","+~~(routes[0][0].y)+")";
 		}else{
-			$('#device'+i).html(
-				`
-				<p>执行任务${device}${i+1}的坐标(${~~(animatePoint[i].x)},${~~(animatePoint[i].y)}),速度${speed},目标点坐标为(${routes[i][routes[i].length
-					- 1].x},${routes[i][routes[i].length- 1].y})</p>
-				`
-				)
+			tableData[i].target = "("+~~(routes[i][routes[i].length - 1].x) +","+~~(routes[i][routes[i].length - 1].y)+")";
+		}
+		if(tableData[i].target === tableData[i].currentPosition){
+			tableData[i].status = "未启用"
+		}else{
+			tableData[i].status = "任务中"
+			if(timeSpent[i] > 0){
+				tableData[i].timeLeft = ~~(droneMaxTime - (new Date().getTime() - timeSpent[i])/1000); 
+			}
+		}
+		
+		if(i === 0){
+			tools.initTable();
 		}
 		//------------------------------------------资源最少方案------------------------------------------
 		if(taskProgramme === 1){
