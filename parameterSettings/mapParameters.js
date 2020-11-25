@@ -48,6 +48,8 @@ layui.use(['layer','form'], function(){
                 width_X = Number($('input[name="width_X"]').val());
                 area_x = Math.ceil(area_x / width_X) * width_X;
                 area_y = Math.ceil(area_y / height_Y) * height_Y;
+                points = [];
+                running = false;
                 drawGrid();
                 layer.closeAll(); //疯狂模式，关闭所有层
             }
@@ -89,21 +91,27 @@ layui.use(['layer','form'], function(){
             </div>
         </div>
         <div class="layui-form-item">
+            <label class="layui-form-label">总资源数量</label>
+            <div class="layui-input-block">
+                <input type="text" name="resourcesTotal" lay-verify="title" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
             <label class="layui-form-label">探测资源数量</label>
             <div class="layui-input-block">
-                <input type="text" name="surveyRescue" lay-verify="title" autocomplete="off" class="layui-input">
+                <input type="text" name="surveyResources" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">围捕资源数量</label>
             <div class="layui-input-block">
-                <input type="text" name="roundUpRescue" lay-verify="title" autocomplete="off" class="layui-input">
+                <input type="text" name="roundUpResources" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">打击资源数量</label>
             <div class="layui-input-block">
-                <input type="text" name="attackRescue" lay-verify="title" autocomplete="off" class="layui-input">
+                <input type="text" name="attackResources" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
     </form>
@@ -111,9 +119,9 @@ layui.use(['layer','form'], function(){
     $('#resBtn').click(function(){
         layer.open({
             type: 1
-            ,title: ['资源设置', 'font-size:18px;']
+            ,title: ['设置设备资源', 'font-size:18px;']
             ,offset:  '300px'
-            ,area: ['500px', '500px']
+            ,area: ['500px', '550px']
             ,content: resDom
             ,btnAlign: 'c'
             ,shadeClose:true
@@ -124,33 +132,47 @@ layui.use(['layer','form'], function(){
                 $('input[name="drones"]').val(drones);
                 $('input[name="ship"]').val(ship);
                 $('input[name="submarine"]').val(submarine);
-                $('input[name="surveyRescue"]').val(surveyRescue);
-                $('input[name="roundUpRescue"]').val(roundUpRescue);
-                $('input[name="attackRescue"]').val(attackRescue);
+                $('input[name="resourcesTotal"]').val(resourcesTotal);
+                $('input[name="surveyResources"]').val(surveyResources);
+                $('input[name="roundUpResources"]').val(roundUpResources);
+                $('input[name="attackResources"]').val(attackResources);
                 
             }
             ,btn: ['确认', '重置']
             ,yes: function(index, layero){
+                if(Number($('input[name="total"]').val()) != Number($('input[name="drones"]').val()) + 
+                Number($('input[name="ship"]').val()) + Number($('input[name="submarine"]').val())){
+                    layer.msg('无人平台数需要等于各个平台数相加！', {icon: 5}); 
+                    return;
+                }else if(Number($('input[name="resourcesTotal"]').val()) !=  Number($('input[name="surveyResources"]').val()) + 
+                Number($('input[name="roundUpResources"]').val()) + Number($('input[name="attackResources"]').val())){
+                    layer.msg('总资源数需要等于各个资源数相加！', {icon: 5}); 
+                    return;
+                }
                 $('#status').text("");
                 total = Number($('input[name="total"]').val());
                 drones = Number($('input[name="drones"]').val());
                 ship = Number($('input[name="ship"]').val());
                 submarine = Number($('input[name="submarine"]').val());
-                surveyRescue = Number($('input[name="surveyRescue"]').val());
-                roundUpRescue = Number($('input[name="roundUpRescue"]').val());
-                attackRescue = Number($('input[name="attackRescue"]').val());
+                resourcesTotal = Number($('input[name="resourcesTotal"]').val());
+                surveyResources = Number($('input[name="surveyResources"]').val());
+                roundUpResources = Number($('input[name="roundUpResources"]').val());
+                attackResources = Number($('input[name="attackResources"]').val());
                 running = false;
+                //更新数据表格
+                initTableData();
                 layer.closeAll(); //疯狂模式，关闭所有层
             }
             ,btn2: function(index, layero){
                 $('#status').text("");
                 $('input[name="total"]').val(10);
-                $('input[name="drones"]').val(0);
+                $('input[name="drones"]').val(10);
                 $('input[name="ship"]').val(0);
-                $('input[name="submarine"]').val(10);
-                $('input[name="surveyRescue"]').val(10);
-                $('input[name="roundUpRescue"]').val(10);
-                $('input[name="attackRescue"]').val(10);
+                $('input[name="submarine"]').val(0);
+                $('input[name="resourcesTotal"]').val(99);
+                $('input[name="surveyResources"]').val(33);
+                $('input[name="roundUpResources"]').val(33);
+                $('input[name="attackResources"]').val(33);
                 running = false;
                 return false;
             }
@@ -218,7 +240,7 @@ layui.use(['layer','form'], function(){
     $('#resParametersBtn').click(function(){
         layer.open({
             type: 1
-            ,title: ['资源参数设置', 'font-size:18px;']
+            ,title: ['设置设备资源参数', 'font-size:18px;']
             ,area: ['500px', '665px']
             ,content: resParametersDom
             ,btnAlign: 'c'
@@ -247,6 +269,7 @@ layui.use(['layer','form'], function(){
                 submarineSpeed = Number($('input[name="submarineSpeed"]').val());
                 submarineMaxTiem = Number($('input[name="submarineMaxTiem"]').val());
                 submarineMaxLoad = Number($('input[name="submarineMaxLoad"]').val());
+                initTableData();
                 layer.closeAll(); //疯狂模式，关闭所有层
             }
             ,btn2: function(index, layero){
@@ -282,6 +305,12 @@ layui.use(['layer','form'], function(){
             </div>
         </div>
         <div class="layui-form-item">
+            <label class="layui-form-label">探测任务所需资源</label>
+            <div class="layui-input-block">
+                <input type="text" name="surveyUseResrouce" lay-verify="number" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
             <label class="layui-form-label">围捕任务最小完成条件</label>
             <div class="layui-input-block">
                 <input type="radio" name="roundUpRequirement" value="1" title="1架设备">
@@ -309,13 +338,19 @@ layui.use(['layer','form'], function(){
                 <input type="text" name="attackTime" lay-verify="number" autocomplete="off" class="layui-input">
             </div>
         </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">打击任务所需资源</label>
+            <div class="layui-input-block">
+                <input type="text" name="attackUseResrouce" lay-verify="number" autocomplete="off" class="layui-input">
+            </div>
+        </div>
     </form>
     `
     $('#taskBtn').click(function(){
         layer.open({
             type: 1
-            ,title: ['资源参数设置', 'font-size:18px;']
-            ,area: ['500px', '550px']
+            ,title: ['设置任务的完成条件', 'font-size:18px;']
+            ,area: ['500px', '630px']
             ,content: taskDom
             ,btnAlign: 'c'
             ,shadeClose:true
@@ -327,16 +362,24 @@ layui.use(['layer','form'], function(){
                 $('input[name="surveyTime"]').val(surveyTime);
                 $('input[name="roundUpTime"]').val(roundUpTime);
                 $('input[name="attackTime"]').val(attackTime);
+                $('input[name="surveyUseResrouce"]').val(surveyUseResrouce);
+                $('input[name="attackUseResrouce"]').val(attackUseResrouce);
                 form.render();
             }
             ,btn: ['确认', '重置']
             ,yes: function(index, layero){
+                if(droneMaxLoad * Number($('input[name="attackRequirement"]:checked').val()) < Number($('input[name="attackUseResrouce"]').val())){
+                    layer.msg('设备没有足够资源去完成任务！请重新设置', {icon: 5}); 
+                    return;
+                }
                 surveyRequirement = Number($('input[name="surveyRequirement"]:checked').val());
                 roundUpRequirement = Number($('input[name="roundUpRequirement"]:checked').val());
                 attackRequirement = Number($('input[name="attackRequirement"]:checked').val());
                 surveyTime = Number($('input[name="surveyTime"]').val());
                 roundUpTime = Number($('input[name="roundUpTime"]').val());
                 attackTime = Number($('input[name="attackTime"]').val());
+                surveyUseResrouce = Number($('input[name="surveyUseResrouce"]').val());
+                attackUseResrouce = Number($('input[name="attackUseResrouce"]').val());
                 layer.closeAll(); //疯狂模式，关闭所有层
             }
             ,btn2: function(index, layero){
@@ -344,8 +387,10 @@ layui.use(['layer','form'], function(){
                 $(`input[name="roundUpRequirement"][value='2']`).prop("checked",true);
                 $(`input[name="attackRequirement"][value='3']`).prop("checked",true);
                 $('input[name="surveyTime"]').val(0);
-                $('input[name="roundUpTime"]').val(0);
-                $('input[name="attackTime"]').val(0);
+                $('input[name="roundUpTime"]').val(1000);
+                $('input[name="attackTime"]').val(1000);
+                $('input[name="surveyUseResrouce"]').val(1);
+                $('input[name="attackUseResrouce"]').val(2);
                 form.render();
                 return false;
             }

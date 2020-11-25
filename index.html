@@ -34,38 +34,41 @@
 							<div id="wrap" style="display:none;">
 							</div>
 							<div>
-								<textarea id="info" name="info" style="margin-top:5px; resize: none; width: 800px;"   class="layui-textarea"></textarea>
+								<div class="imageDiv">
+									<p>无人机</p>
+									<img id="drones" class="imageClass"  src="./layui/images/无人机.png">
+								</div>
+								<div class="imageDiv">
+									<p>打击资源无人机</p>
+									<img id="dronesWithArms" class="imageClass"  src="./layui/images/无人机 (1).png">
+								</div>
+								<div class="imageDiv">
+									<p>无人船</p>
+									<img id="ship" class="imageClass"  src="./layui/images/帆船.png">
+								</div>
+								<div class="imageDiv">
+									<p>打击资源无人船</p>
+									<img id="shipWithArms" class="imageClass"  src="./layui/images/帆船 (1).png">
+								</div>
+								<div class="imageDiv">
+									<p>无人潜艇</p>
+									<img id="submarine" class="imageClass"  src="./layui/images/潜艇.png">
+								</div>
+								<div class="imageDiv">
+									<p>打击资源无人潜艇机</p>
+									<img id="submarineWithArms" class="imageClass"  src="./layui/images/潜艇 (1).png">
+								</div>
 							</div>
-							<div class="imageDiv">
-								<p>无人机</p>
-								<img id="drones" class="imageClass"  src="./layui/images/无人机.png">
-							</div>
-							<div class="imageDiv">
-								<p>打击资源无人机</p>
-								<img id="dronesWithArms" class="imageClass"  src="./layui/images/无人机 (1).png">
-							</div>
-							<div class="imageDiv">
-								<p>无人船</p>
-								<img id="ship" class="imageClass"  src="./layui/images/帆船.png">
-							</div>
-							<div class="imageDiv">
-								<p>打击资源无人船</p>
-								<img id="shipWithArms" class="imageClass"  src="./layui/images/帆船 (1).png">
-							</div>
-							<div class="imageDiv">
-								<p>无人潜艇</p>
-								<img id="submarine" class="imageClass"  src="./layui/images/潜艇.png">
-							</div>
-							<div class="imageDiv">
-								<p>打击资源无人潜艇机</p>
-								<img id="submarineWithArms" class="imageClass"  src="./layui/images/潜艇 (1).png">
-							</div>
+							
 						</div>
 						<div class="layui-col-md6" style="padding-top: 10px;padding-left: 30px;">
 							<div id="infoDiv">
 								<label>无人机信息</label>
 							</div>
 							<table id="table" lay-filter="test"></table>
+							<div>
+								<textarea id="info" name="info" style="margin-top:5px; resize: none; width: 800px;"   class="layui-textarea"></textarea>
+							</div>
 							<div class="input-group mb-3">
 								<hr class="layui-bg-red">
 								<div id="status" class="show-grid" style="display:block;"></div>
@@ -74,7 +77,7 @@
 									<button id="clear_btn" class="layui-btn">重置</button>
 								</div>
 								<div class="layui-form-item">
-									<button id="start_btn" class="layui-btn" lay-submit="" lay-filter="">开始/重新开始</button>
+									<button id="start_btn" class="layui-btn" lay-submit="" lay-filter="">规划路线/重新规划路线</button>
 									<!-- <button id="avoidHidden" class="layui-btn">避障路线</button> -->
 									<button id="stop_btn" class="layui-btn">停止/继续</button>
 								</div>
