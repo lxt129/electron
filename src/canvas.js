@@ -24,16 +24,22 @@ function init_mouse() {
 		x = x % 800;
 		y = y % 800;
 		point = new Point(x, y);
-		if (unique(points, point) !== true) {
-			alert("该区域有目标点,无法添加障碍!");
-			return;
+		// if (unique(points, point) !== true) {
+		// 	alert("该区域有目标点,无法添加障碍!");
+		// 	return;
+		// }
+		// if (unique(hidden, point) !== true) {
+		// 	let i = unique(hidden, point);
+		// 	hidden.splice(i, 1);
+		// } else {
+		// 	hidden.push(point);
+		// }
+		let key = findPoint(points,point)
+		if(key !== false){
+			console.log("!!!")
+			points[key].isTargetUnfind = true;
 		}
-		if (unique(hidden, point) !== true) {
-			let i = unique(hidden, point);
-			hidden.splice(i, 1);
-		} else {
-			hidden.push(point);
-		}
+		
 		return false;
 	}
 	$("canvas").click(function(evt) {
@@ -80,7 +86,7 @@ function drawCircle(point) {
 	} else if(point.hasOwnProperty('isComplete')){
 		ctx.fillStyle = '#000';
 		ctx.arc(point.x, point.y, 3, 0, Math.PI * 2, true);
-	} else if (point.hasOwnProperty('isTarget')) {
+	} else if (point.hasOwnProperty('isTarget')||point.hasOwnProperty('isTargetUnfind')) {
 		ctx.fillStyle = 'red';
 		ctx.arc(point.x, point.y, 5, 0, Math.PI * 2, true);
 	} else {
@@ -95,9 +101,11 @@ function drawCircle(point) {
 function drawHiddenArea(point) {
 	ctx.fillStyle = '#999999';
 	ctx.beginPath();
+	ctx.globalAlpha=0.2;
 	ctx.fillRect(point.x - width_X * 0.5 * (800 / area_x), point.y - height_Y * 0.5 * (800 / area_x), width_X * (800 /
 		area_x), height_Y * (800 / area_x));
 	ctx.closePath();
+	ctx.globalAlpha=1;
 	ctx.fill();
 }
 
@@ -172,6 +180,17 @@ function drawGrid() {
 		ctx.stroke();
 	}
 	ctx.closePath();
+	ctx.fill();
+}
+
+function drawSurveyShow(point){
+	ctx.fillStyle = '#999999';
+	ctx.beginPath();
+	ctx.globalAlpha=0.2;
+	ctx.fillRect(point.x - width_X * 0.5 * (800 / area_x), point.y - height_Y * 0.5 * (800 / area_x), width_X * (800 /
+		area_x), height_Y * (800 / area_x));
+	ctx.closePath();
+	ctx.globalAlpha=1;
 	ctx.fill();
 }
 

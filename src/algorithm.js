@@ -150,7 +150,6 @@ function selection() {
 		parents.push(population[wheelOut(Math.random())]);
 	} //选择POPULATION_SIZE-initnum个个体(有概率会选择重复的)
 	population = parents; //新种群
-	
 }
 
 //选择交叉的个体

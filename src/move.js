@@ -58,15 +58,12 @@ function move(routes) {
 		timeSpent[i] = new Date().getTime();
 	}
 	if(taskEquipment === 1){
-		speed = droneSpeed;
 		maxTime = droneMaxTime * 1000;
 		resource = droneMaxLoad;
 	}else if(taskEquipment === 2){
-		speed = shipSpeed
 		maxTime = shipMaxTime * 1000;
 		resource = shipMaxLoad;
 	}else{
-		speed = submarineSpeed;
 		maxTime = submarineMaxTiem * 1000;
 		resource = submarineMaxLoad;
 	}
@@ -93,7 +90,7 @@ function move(routes) {
 	// ctx.clearRect(0, 0, cvs.clientWidth, cvs.clientHeight)
 	for (var i = 0; i < SALES_MEN; i++) {
 		if (routes[i].length > 0) {
-			drawPoint(routes[i][0].x, routes[i][0].y)
+			drawPoint(routes[i][0].x, routes[i][0].y,tableData[i].type)
 		}
 	}
 	this.startTimer()
@@ -132,16 +129,36 @@ let end = 0;
 
 function startMove() {
 	for (let i = 0; i < routes.length; i++) {
+		
+		if(tableData[i].type == "无人机"){
+			speed = droneSpeed;
+		}else if(tableData[i].type == "无人船"){
+			speed = shipSpeed;
+		}else if(tableData[i].type == "无人潜艇"){
+			speed = submarineSpeed;
+		}
+		
 		tableData[i].currentPosition = "("+~~(animatePoint[i].x) +","+~~(animatePoint[i].y)+")";
 		if(i < SALES_MEN){
 			tableData[i].target = "("+~~(routes[0][0].x) +","+~~(routes[0][0].y)+")";
 		}else{
 			tableData[i].target = "("+~~(routes[i][routes[i].length - 1].x) +","+~~(routes[i][routes[i].length - 1].y)+")";
 		}
-		if(tableData[i].target === tableData[i].currentPosition){
-			tableData[i].status = "未启用"
+		if(tableData[i].target === tableData[i].currentPosition && tableData[i].target == "("+~~(routes[0][0].x) +","+~~(routes[0][0].y)+")"){
+			tableData[i].status = "未启用";
+			tableData[i].target = null;
+			tableData[i].timeLeft = null;
+			if(tableData[i].id == "无人机"){
+				tableData[i].load = droneMaxLoad;
+			}else if(tableData[i].id == "无人船"){
+				tableData[i].load = shipMaxLoad;
+			}else{
+				tableData[i].load = submarineMaxLoad;
+			}
+			
+			
 		}else{
-			tableData[i].status = "任务中"
+			tableData[i].status = "任务中";
 			if(timeSpent[i] > 0){
 				tableData[i].timeLeft = ~~(droneMaxTime - (new Date().getTime() - timeSpent[i])/1000); 
 			}
@@ -166,7 +183,7 @@ function startMove() {
 				}
 				// 只能访问一次
 				targetNum[i] = targetNum[i] + 3;
-				console.log(i,taskFalg)
+				//console.log(i,taskFalg)
 				let k = taskType === 2 ? roundUpRequirement : attackRequirement;
 				//设备达到任务要求后执行任务
 				if(taskFalg == newAddRoute.length - taskDeviceIndex*k){
@@ -182,7 +199,21 @@ function startMove() {
 						taskSort[0].isComplete = true;
 						taskSort.shift();
 						if(taskType === 3){
-							load[taskDeviceIndex] = load[taskDeviceIndex] - 2;
+							load[taskDeviceIndex] = load[taskDeviceIndex] - attackUseResrouce;
+							//打击减少打击资源数
+							let j = taskDeviceIndex*attackRequirement + SALES_MEN;
+							let k = taskDeviceIndex*attackRequirement + SALES_MEN + attackRequirement;
+							let remain = attackUseResrouce;
+							for(j;j < k;j++){
+								if(tableData[j].load >= remain){
+									tableData[j].load = tableData[j].load - remain;
+									remain = 0;
+								}else{
+									remain = remain - tableData[j].load;
+									tableData[j].load = 0;
+								}
+							}
+							
 						}
 					},sleep,i) 
 				}
@@ -201,23 +232,19 @@ function startMove() {
 			
 			//超时回家 或者 没资源回家
 			if(i === routes.length - 1 && taskFinish && isGoBack == false){
-				console.log("!!!!!!!!!!!!")
 				let thisTime = new Date().getTime() - timeSpent[i] + distance(routes[i][routes[i].length - 1],routes[0][0])/speed*1000;
 				if(thisTime > maxTime){
-					console.log("!!!!")
 					while(k > 0){
 						//console.log(routes.length,key,k)
 						addRoute3(routes.length -k,routes[routes.length - k][routes[routes.length - k].length - 1],routes[0][0]);
+						
 						k--;
 					}
 					isGoBack = true;
-					console.log(load[taskDeviceIndex] )
-				}else if(load[taskDeviceIndex] < 2 && taskType === 3){
-					console.log("taskDeviceIndex",taskDeviceIndex)
+				}else if(load[taskDeviceIndex] < attackUseResrouce && taskType === 3){
 					while(k > 0){
-						console.log(routes.length,key,k)
-						console.log("!!!!")
 						addRoute3(routes.length -k,routes[routes.length - k][routes[routes.length - k].length - 1],routes[0][0]);
+						
 						k--;
 					}
 					isGoBack = true;
@@ -243,7 +270,7 @@ function startMove() {
 				let preTime = new Date().getTime() - timeSpent[i] + sleep + (distance(point,routes[i][routes[i].length - 1])+distance(point,routes[0][0]))/speed*1000;
 
 				//超时或者资源不够  资源不够最后一个目标为起点也不执行
-				if(preTime > maxTime || isGoBack === true || load[taskDeviceIndex] < 2){
+				if(preTime > maxTime || isGoBack === true || load[taskDeviceIndex] < attackUseResrouce){
 					if(point !== routes[0][0]){
 						let a = -1;
 						let htmllet;
@@ -262,6 +289,7 @@ function startMove() {
 						if(isGoBack === false){
 							while(k > 0){
 								addRoute3(routes.length - key -k,routes[routes.length  - key - k][routes[routes.length  - key - k].length - 1],routes[0][0]);
+							
 								k--;
 							}
 						}
@@ -681,16 +709,16 @@ function startMove() {
 		
 		if (nextPointIndex[i] > routes[i].length - 1) {
 			end = 0;
-			for (let a = 0; a < SALES_MEN; a++) {
-				if (nextPointIndex[a] > routes[a].length - 1) {
+			for (let a = 0; a < routes.length; a++) {
+				if (nextPointIndex[a] > routes[a].length - 1 && tableData[a].status == "未启用") {
 					end++;
 				} else {
 					break;
 				}
 			}
 			if (end == routes.length) {
+				initTableData(taskEquipment)
 				console.log("move end!!!")
-
 				clearTimer();
 			}
 			continue;
@@ -712,7 +740,16 @@ function startMove() {
 				x: routes[i][nextPointIndex[i]].x,
 				y: routes[i][nextPointIndex[i]].y,
 			}
+			
 			nextPointIndex[i]++
+
+			let point = routes[i][nextPointIndex[i] - 1];
+			
+			surveyShow.push(point);
+			setTimeout(function(){
+				surveyShow.shift();
+			},100) 
+
 
 			clearTimer();
 
@@ -721,7 +758,7 @@ function startMove() {
 			//重绘
 			//ctx.clearRect(0, 0, cvs.clientWidth, cvs.clientHeight)
 			//drawPolygon(allPoints)
-			drawPoint(animatePoint[i].x, animatePoint[i].y, 'blue')
+			drawPoint(animatePoint[i].x, animatePoint[i].y, tableData[i].type)
 			return
 		}
 
@@ -730,7 +767,15 @@ function startMove() {
 			clearTimer();
 			continue;
 		} else {
-			let deltaTime = new Date().getTime() - startTime[i]
+			if(i > SALES_MEN - 1 && distance(animatePoint[i - 1],animatePoint[i]) < 5 && animatePoint[i - 1].x != routes[i][routes[i].length - 1].x
+			&& animatePoint[i - 1].y != routes[i][routes[i].length - 1].y){
+				startTime[i] = startTime[i] + 30;
+			}
+
+			let deltaTime = new Date().getTime() - startTime[i];			
+			if(deltaTime < 0)
+				deltaTime = 0;
+			
 			let deltaDistance = deltaTime * (speed/1000); 
 			let rate = deltaDistance / targetDistance[i]
 			let x =
@@ -742,8 +787,8 @@ function startMove() {
 			//重绘, 将animatePoint设为轨迹的下一个点, 以达到动态的效果
 			animatePoint[i].x = x
 			animatePoint[i].y = y
-			
-			drawPoint(animatePoint[i].x, animatePoint[i].y, 'blue')
+
+			drawPoint(animatePoint[i].x, animatePoint[i].y, tableData[i].type)
 		}
 	}
 }
@@ -752,50 +797,50 @@ function drawTargetPoint() {
 	for (var i = 0; i < targetPointHit.length; i++) {
 		var a = targetPointHit[i].isHit;
 		if(a >= 1){
-			drawPoint(targetPointHit[i].x - width_X*0.5, targetPointHit[i].y, "black")
+			drawPoint(targetPointHit[i].x - width_X*0.5, targetPointHit[i].y, "无人机")
 		}
 		if(a >= 2){
-			drawPoint(targetPointHit[i].x + width_X*0.5, targetPointHit[i].y, "black")
+			drawPoint(targetPointHit[i].x + width_X*0.5, targetPointHit[i].y, "无人机")
 		}
 		if(a >= 3){
-			drawPoint(targetPointHit[i].x , targetPointHit[i].y - height_Y*0.5, "black")
+			drawPoint(targetPointHit[i].x , targetPointHit[i].y - height_Y*0.5, "无人机")
 		}
 		if(a >= 4){
-			drawPoint(targetPointHit[i].x, targetPointHit[i].y + height_Y*0.5, "black")
+			drawPoint(targetPointHit[i].x, targetPointHit[i].y + height_Y*0.5, "无人机")
 		}
 	}
 	for (var i = 0; i < targetPointSurround.length; i++) {
 		var a = targetPointSurround[i].isSurround;
 		if(a >= 1){
-			drawPoint(targetPointSurround[i].x - width_X*0.5, targetPointSurround[i].y, "blue")
+			drawPoint(targetPointSurround[i].x - width_X*0.5, targetPointSurround[i].y, "无人机")
 		}
 		if(a >= 2){
-			drawPoint(targetPointSurround[i].x + width_X*0.5, targetPointSurround[i].y, "blue")
+			drawPoint(targetPointSurround[i].x + width_X*0.5, targetPointSurround[i].y, "无人机")
 		}
 		if(a >= 3){
-			drawPoint(targetPointSurround[i].x , targetPointSurround[i].y - height_Y*0.5, "black")
+			drawPoint(targetPointSurround[i].x , targetPointSurround[i].y - height_Y*0.5, "无人机")
 		}
 		if(a >= 4){
-			drawPoint(targetPointSurround[i].x, targetPointSurround[i].y + height_Y*0.5, "black")
+			drawPoint(targetPointSurround[i].x, targetPointSurround[i].y + height_Y*0.5, "无人机")
 		}
 	}
 }
 
-function drawPoint(x, y, color) {
+function drawPoint(x, y, type) {
 	var img;
-	if(taskEquipment === 1){
+	if(type === "无人机"){
 		if(taskType !== 3){
 			img=document.getElementById("drones");;
 		}else{
 			img=document.getElementById("dronesWithArms");
 		}
-	}else if(taskEquipment === 2){
+	}else if(type === "无人船"){
 		if(taskType !== 3){
 			img=document.getElementById("ship");
 		}else{
 			img=document.getElementById("shipWithArms");
 		}
-	}else if(taskEquipment === 3){
+	}else if(type === "无人潜艇"){
 		if(taskType !== 3){
 			img=document.getElementById("submarine");
 		}else{

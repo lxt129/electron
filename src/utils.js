@@ -1,6 +1,7 @@
 Array.prototype.clone = function() {
 	return this.slice(0);
 }
+
 Array.prototype.shuffle = function() {
 	for (var j, x, i = this.length - 1; i; j = randomNumber(i), x = this[--i], this[i] = this[j], this[j] = x);
 	return this;
@@ -92,7 +93,7 @@ function euclidean(dx, dy) {
 function findPoint(points, point) {
 	for (var i = 0; i < points.length; i++) {
 		if (point.x == points[i].x && point.y == points[i].y) {
-			return point;
+			return i;
 		}
 	}
 	return false;
