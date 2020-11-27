@@ -68,10 +68,8 @@ function init_mouse() {
 				points.push(point);
 			}
 
-			if (points.length <= SALES_MEN) {
-				for (var i = 0; i < SALES_MEN; i++) {
-					points[i].isCenter = true;
-				}
+			if (points.length <= 1) {
+				points[0].isCenter = true;
 			}
 		}
 	});

@@ -1,5 +1,4 @@
 //-------------------引入electron的dialog-------------------
-const {dialog} = nodeRequire('electron').remote;
 const {remote} = nodeRequire('electron')
 //-------------------绘图的全局变量-------------------
 var canvas, ctx, cvs;
@@ -111,6 +110,7 @@ $(function() {
 			GAInitialize();
 			while(currentGeneration <= 1000){
 				GANextGeneration();
+				console.log(currentGeneration)
 			}
 			//判断大致需要的无人设备数量
 			SALES_MEN = Math.ceil(routeLenth/(droneSpeed * (droneMaxTime*0.8)));
@@ -172,6 +172,21 @@ $(function() {
 			tableData[i].currentPosition = "("+~~(points[0].x) +","+~~(points[0].y)+")";
 		}
 		tools.initTable();
+	})
+
+	$('#carryOutTask').click(function(){
+		var newPoints = [];
+		newPoints.push(points[0]);
+		for(let i = 0; i < points.length; i++){
+			if(points[i].hasOwnProperty('isTarget')||points[i].hasOwnProperty('isTargetUnfind')){
+				let point = new Point(points[i].x,points[i].y)
+				newPoints.push(point);
+			}
+		}
+		points = newPoints;
+		SALES_MEN = 1;
+		MTSP();
+
 	})
 });
 

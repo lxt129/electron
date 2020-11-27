@@ -894,7 +894,7 @@ function addRoute(targetPoint) {
 	targetNum[routes.length - 1] = 0;
 	startPoint = points[res];
 	drone++;
-	addinfo("第"+drone+"号无人机执行任务,预计距离为:"+routeDistance(routes[routes.length - 1])+"(不包括到达目的点后执行任务的距离和返回基地距离)");
+	addinfo("第"+drone+"号无人机执行任务,预计距离为:"+routeDistance(routes[routes.length - 1])+"(不包括到达目的点后执行任务的距离)");
 	addRouteParams(routes.length - 1);
 	return routes.length - 1;
 }
