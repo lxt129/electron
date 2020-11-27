@@ -115,6 +115,7 @@ function GAInitialize() {
 function GANextGeneration() {
 	currentGeneration++;
 	selection(); 	//选择出新种群
+	
 	crossover(); 	//对新选出的种群进行交叉操作
 	mutation(); 	//变异操作
 	setBestValue(); //获取当前种群最优解和更新全局最优解 
@@ -184,7 +185,7 @@ function getChild(fun, x, y) {
 	while (px.length > 1) {
 		dx = px[fun](px.indexOf(c));
 		dy = py[fun](py.indexOf(c));
-		px.deleteByValue(c);
+		px.deleteByValue(c);                                                                                        
 		py.deleteByValue(c);
 		c = dis[c][dx] < dis[c][dy] ? dx : dy;
 		solution.push(c);
@@ -285,8 +286,8 @@ function setBestValue() {
 	} else {
 		UNCHANGED_GENS += 1; //一轮交叉变异后,最优解没有改变
 	}
-}
 
+}
 
 //获得当前子代的最优解(不是全局最优解)
 function getCurrentBest() {

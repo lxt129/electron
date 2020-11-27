@@ -101,7 +101,7 @@ function findPoint(points, point) {
 
 //计算一段路的距离
 function routeDistance(route){
-	let routeDistance = 0;
+	let routeDistance = distance(route[0],route[route.length - 1]);
 	for (let i = 1; i < route.length; i++) {
 		routeDistance += distance(route[i - 1],route[i]);
 	}
