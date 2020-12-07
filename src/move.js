@@ -31,6 +31,8 @@ let endFlag = 0;
 let startPoint;
 let sleep = 0;
 
+let isConflict = [];
+
 let target = 0;
 let drone = 0;
 
@@ -54,6 +56,7 @@ function move(routes) {
 	goTaskNumner = 0;
 	taskDeviceIndex = -1;
 	isGoBack = false;
+	isConflict = [];
 	for(let i = 0;i < SALES_MEN;i++){
 		timeSpent[i] = new Date().getTime();
 	}
@@ -64,7 +67,7 @@ function move(routes) {
 		maxTime = shipMaxTime * 1000;
 		resource = shipMaxLoad;
 	}else{
-		maxTime = submarineMaxTiem * 1000;
+		maxTime = submarineMaxTime * 1000;
 		resource = submarineMaxLoad;
 	}
 	if(taskType === 1){
@@ -101,7 +104,7 @@ function startTimer(index) {
 		startTime[index] = new Date().getTime()
 	} else {
 		for (var i = 0; i < routes.length; i++) {
-			startTime[i] = new Date().getTime()
+			startTime[i] = new Date().getTime(); 
 		}
 	}
 
@@ -129,7 +132,13 @@ let end = 0;
 
 function startMove() {
 	for (let i = 0; i < routes.length; i++) {
-		
+		// if(i == routes.length - 1){
+		// 	if(Number(tableData[i].spendTime) * 1000 < maxTime){
+		// 		maxTime = Number(tableData[i].spendTime) * 1000;
+		// 		console.log(maxTime,"!!!!")
+		// 	}
+		// }
+
 		if(tableData[i].type == "无人机"){
 			speed = droneSpeed;
 		}else if(tableData[i].type == "无人船"){
@@ -160,7 +169,7 @@ function startMove() {
 		}else{
 			tableData[i].status = "任务中";
 			if(timeSpent[i] > 0){
-				tableData[i].timeLeft = ~~(droneMaxTime - (new Date().getTime() - timeSpent[i])/1000); 
+				tableData[i].timeLeft = ~~(tableData[i].spendTime - (new Date().getTime() - timeSpent[i])/1000); 
 			}
 		}
 		
@@ -189,6 +198,8 @@ function startMove() {
 				if(taskFalg == newAddRoute.length - taskDeviceIndex*k){
 					taskFalg = 0;
 					taskSort.push(routes[i][nextPointIndex[i] - 1])
+					let str = `目标为:(${taskSort[0].x},${taskSort[0].y})的${taskType === 2?"围捕任务":"打击任务"},开始时间为:${formatDate(new Date().getTime())}`
+					logbookInfo.push(str);
 					setTimeout(function(){
 						taskFinish = true;
 						if(taskType === 2){
@@ -196,8 +207,11 @@ function startMove() {
 						}else{
 							taskSort[0].isHit = 0;
 						}
-						taskSort[0].isComplete = true;
+						let str = `目标为:(${taskSort[0].x},${taskSort[0].y})的${taskType === 2?"围捕任务":"打击任务"},完成时间为:${formatDate(new Date().getTime())}`
+						logbookInfo.push(str);
+						taskSort[0].isComplete = true;                 
 						taskSort.shift();
+						
 						if(taskType === 3){
 							load[taskDeviceIndex] = load[taskDeviceIndex] - attackUseResrouce;
 							//打击减少打击资源数
@@ -237,14 +251,14 @@ function startMove() {
 					while(k > 0){
 						//console.log(routes.length,key,k)
 						addRoute3(routes.length -k,routes[routes.length - k][routes[routes.length - k].length - 1],routes[0][0]);
-						
+						startTime[routes.length -k] = new Date().getTime() + k*60;
 						k--;
 					}
 					isGoBack = true;
 				}else if(load[taskDeviceIndex] < attackUseResrouce && taskType === 3){
 					while(k > 0){
 						addRoute3(routes.length -k,routes[routes.length - k][routes[routes.length - k].length - 1],routes[0][0]);
-						
+						startTime[routes.length -k] = new Date().getTime() + k*60;
 						k--;
 					}
 					isGoBack = true;
@@ -268,6 +282,7 @@ function startMove() {
 				point = nextTarget[minIndex];
 
 				let preTime = new Date().getTime() - timeSpent[i] + sleep + (distance(point,routes[i][routes[i].length - 1])+distance(point,routes[0][0]))/speed*1000;
+				
 
 				//超时或者资源不够  资源不够最后一个目标为起点也不执行
 				if(preTime > maxTime || isGoBack === true || load[taskDeviceIndex] < attackUseResrouce){
@@ -275,6 +290,7 @@ function startMove() {
 						let a = -1;
 						let htmllet;
 						a = addRoute(point);
+						startTime[a] = new Date().getTime() + (a%k)*60;
 						timeSpent[a] = new Date().getTime()
 						newAddRoute.push(a);
 						htmllet = `
@@ -289,7 +305,7 @@ function startMove() {
 						if(isGoBack === false){
 							while(k > 0){
 								addRoute3(routes.length - key -k,routes[routes.length  - key - k][routes[routes.length  - key - k].length - 1],routes[0][0]);
-							
+								startTime[routes.length- key -k] = new Date().getTime() + k*60;
 								k--;
 							}
 						}
@@ -306,6 +322,8 @@ function startMove() {
 						if(newAddRoute[a] === i && nextPointIndex[i] > routes[i].length - 1 && nextTarget.length > 0){
 							flag++;
 							addRoute3(newAddRoute[a],routes[newAddRoute[a]][routes[newAddRoute[a]].length -1],point);
+							startTime[newAddRoute[a]] = new Date().getTime() + (attackRequirement - a%attackRequirement)*60;
+							console.log(startTime[newAddRoute[a]]);
 							targetNum[newAddRoute[a]] = 0;
 						}
 					}
@@ -347,6 +365,7 @@ function startMove() {
 						taskFalg = 0;
 					}
 				}
+				
 				//console.log(i,taskFalg,status[a])
 				//for(let a = 0;a < status.length;a++){
 					if(status[a] === true){
@@ -354,6 +373,9 @@ function startMove() {
 						status[a] = false;
 						taskStatusIndex.push(a);
 						taskSort.push(routes[i][nextPointIndex[i] - 1])
+						//添加信息
+						let str = `目标为:(${taskSort[0].x},${taskSort[0].y})的${taskType === 2?"围捕任务":"打击任务"},开始时间为:${formatDate(new Date().getTime())}`
+						logbookInfo.push(str);
 						setTimeout(function(){
 							if(taskType === 2){
 								taskSort[0].isSurround = 0;
@@ -361,15 +383,15 @@ function startMove() {
 								taskSort[0].isHit = 0;
 							}
 							taskSort[0].isComplete = true;
+							//添加信息
+							let str = `目标为:(${taskSort[0].x},${taskSort[0].y})的${taskType === 2?"围捕任务":"打击任务"},结束时间为:${formatDate(new Date().getTime())}`
+							logbookInfo.push(str);
 							taskSort.shift();
 							status[taskStatusIndex[0]] = true;
 							load[taskStatusIndex[0]] = load[taskStatusIndex[0]] - 2;
-							// console.log("!!!!!!!!!!!!!!!!")
-							// console.log(taskStatusIndex[0],status[taskStatusIndex[0]])
 							for(let b=0;b < status.length;b++){
 								console.log(b,status[b]);
 							}
-							//console.log("!!!!!!!!!!!!!!!!")
 							taskStatusIndex.shift();
 						},sleep) 
 					}
@@ -396,6 +418,7 @@ function startMove() {
 						e = a*c + SALES_MEN;
 						for(let b = 0;b < c;b++){
 							addRoute3(e + b,routes[e + b][routes[e + b].length -1],routes[0][0]);
+							startTime[e + b] = new Date().getTime() + b*60;
 						}
 						status[d] = false;
 					}
@@ -410,10 +433,11 @@ function startMove() {
 				if(status[a] === true){
 					d = a;
 					e = a*c + SALES_MEN;
-					let thisTime = new Date().getTime() - timeSpent[e] + +distance(routes[e][routes[e].length - 1],routes[0][0])/speed*1000;
+					let thisTime = new Date().getTime() - timeSpent[e] +distance(routes[e][routes[e].length - 1],routes[0][0])/speed*1000;
 					if(thisTime > maxTime){
 						for(let b = 0;b < c;b++){
 							addRoute3(e + b,routes[e + b][routes[e + b].length -1],routes[0][0]);
+							startTime[e + b] = new Date().getTime() + b*60;
 						}
 						status[d] = false;
 					}
@@ -434,6 +458,7 @@ function startMove() {
 						if(load[a] < 2){
 							for(let b = 0;b < c;b++){
 								addRoute3(e + b,routes[e + b][routes[e + b].length -1],routes[0][0]);
+								startTime[e + b] = new Date().getTime() + b*60;
 							}
 							status[d] = false;
 						}
@@ -471,6 +496,7 @@ function startMove() {
 							<div id="device${a}" style="display:block;margin-top:5px"></div>
 							`;
 							$('#infoDiv').append(htmllet);
+							startTime[a] = new Date().getTime() + k*60;
 							timeSpent[a] = new Date().getTime()
 							k = k - 1;
 						}
@@ -493,6 +519,8 @@ function startMove() {
 							<div id="device${a}" style="display:block;margin-top:5px"></div>
 							`;
 							$('#infoDiv').append(htmllet);
+							startTime[a] = new Date().getTime() + (attackRequirement - k)*60;
+							console.log(startTime[a])
 							timeSpent[a] = new Date().getTime();
 							k = k - 1;
 						}
@@ -529,6 +557,7 @@ function startMove() {
 							<div id="device${a}" style="display:block;margin-top:5px"></div>
 							`;
 							$('#infoDiv').append(htmllet);
+							startTime[a] = new Date().getTime() + k*60;
 							k = k - 1;
 							timeSpent[a] = new Date().getTime()
 						}
@@ -551,18 +580,19 @@ function startMove() {
 									min = t;
 									indexSelect = a;
 									key = true;
+									if(key === true){
+										let c = indexSelect ;
+										let a = indexSelect * roundUpRequirement + SALES_MEN
+										let thisIndex = indexSelect * roundUpRequirement + SALES_MEN
+										let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed*1000;
+										if(thisTime > maxTime){
+											key = false;
+										}
+									}
 								} 
 							}
 						}
-						if(key === true){
-							let thisIndex = indexSelect * roundUpRequirement + SALES_MEN
-							let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed*1000;
-							console.log(thisTime)
-							if(thisTime > maxTime){
-								key = false;
-							}
-							console.log("!!!!")
-						}
+						
 
 						//判断是否从基地出发最近
 						t = distance(routes[0][0],point);
@@ -585,6 +615,7 @@ function startMove() {
 								<div id="device${a}" style="display:block;margin-top:5px"></div>
 								`;
 								$('#infoDiv').append(htmllet);
+								startTime[a] = new Date().getTime() + k*60;
 								k = k - 1;
 								timeSpent[a] = new Date().getTime()
 							}
@@ -592,9 +623,10 @@ function startMove() {
 							load[status.length] = resource * roundUpRequirement;
 						}else{//就近派出的设备
 							let c = indexSelect ;
-							a = indexSelect * roundUpRequirement + SALES_MEN
+							let a = indexSelect * roundUpRequirement + SALES_MEN
 							for(let b = 0;b < roundUpRequirement; b++){
 								addRoute3(a + b,routes[a + b][routes[a + b].length -1],point);
+								startTime[a + b] = new Date().getTime() + b*60;
 								targetNum[a + b] = 0;
 							}
 							status[c] = false;
@@ -618,6 +650,7 @@ function startMove() {
 							<div id="device${a}" style="display:block;margin-top:5px"></div>
 							`;
 							$('#infoDiv').append(htmllet);
+							startTime[a] = new Date().getTime() + k*60;
 							timeSpent[a] = new Date().getTime()
 							k = k - 1;
 						}
@@ -640,19 +673,18 @@ function startMove() {
 									min = t;
 									indexSelect = a;
 									key = true;
+									if(key === true){
+										let thisIndex = indexSelect * attackRequirement + SALES_MEN;
+										let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed*1000;
+										console.log(thisTime)
+										if(thisTime > maxTime){
+											key = false;
+										}
+									}
 								}
 							}
 						}
 
-						if(key === true){
-							let thisIndex = indexSelect * attackRequirement + SALES_MEN
-							let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed*1000;
-							console.log(thisTime)
-							if(thisTime > maxTime){
-								key = false;
-							}
-							console.log("!!!!")
-						}
 						t = distance(routes[0][0],point);
 						if(t < min){
 							min = t;
@@ -669,6 +701,7 @@ function startMove() {
 								<div id="device${a}" style="display:block;margin-top:5px"></div>
 								`;
 								$('#infoDiv').append(htmllet);
+								startTime[a] = new Date().getTime() + k*60;
 								timeSpent[a] = new Date().getTime()
 								k = k - 1;
 							}
@@ -678,6 +711,7 @@ function startMove() {
 							a = indexSelect * attackRequirement + SALES_MEN
 							for(let b = 0;b < attackRequirement; b++){
 								addRoute3(a + b,routes[a + b][routes[a + b].length -1],point);
+								startTime[a + b] = new Date().getTime() + b*60;
 								targetNum[a + b] = 0;
 							}
 							status[c] = false;
@@ -742,15 +776,18 @@ function startMove() {
 			}
 			
 			nextPointIndex[i]++
-
 			let point = routes[i][nextPointIndex[i] - 1];
-			
-			surveyShow.push(point);
-			setTimeout(function(){
-				surveyShow.shift();
-			},100) 
-
-
+			if(point.isCenter !== true){
+				surveyShow.push(point);
+				logbook.push(i);
+				setTimeout(function(){
+					let str = `${logbook[0]}号设备探测目标为:(${surveyShow[0].x},${surveyShow[0].y}),探测时间为:${formatDate(new Date().getTime())}`
+					logbookInfo.push(str);
+					logbook.shift();
+					surveyShow.shift();
+				},100)
+			}
+			 
 			clearTimer();
 
 			startTimer(i);
@@ -767,9 +804,35 @@ function startMove() {
 			clearTimer();
 			continue;
 		} else {
-			if(i > SALES_MEN - 1 && distance(animatePoint[i - 1],animatePoint[i]) < 5 && animatePoint[i - 1].x != routes[i][routes[i].length - 1].x
-			&& animatePoint[i - 1].y != routes[i][routes[i].length - 1].y){
-				startTime[i] = startTime[i] + 30;
+			//判断路径有无冲突
+			let flag = false;
+			let k = taskType == 3?attackRequirement:roundUpRequirement;
+			if((i >= SALES_MEN && (i - SALES_MEN)%k == 0) || i < SALES_MEN){
+				for(let j = 0;j < routes.length;j++){
+					if(i == j){
+						continue;
+					}
+					if(nextPointIndex[i] > routes[i].length - 1 || nextPointIndex[j] > routes[j].length - 1){
+						continue;
+					}
+					if(taskType == 2){
+						if(j >= SALES_MEN && (j - SALES_MEN)%roundUpRequirement !== 0){
+							continue;
+						}
+					}else if(taskType == 3){
+						if(j >= SALES_MEN && (j - SALES_MEN)%attackRequirement !== 0){
+							continue;
+						}
+					}
+					if(distance(animatePoint[i],animatePoint[j]) < 10* (speed/1000)){
+						console.log("!!!!",distance(animatePoint[i],animatePoint[j]),10* (speed/1000))
+						flag = true;
+					}
+				}
+			}
+			
+			if(flag && nextPointIndex[0] > 1){
+				startTime[i] = startTime[i] + 60;
 			}
 
 			let deltaTime = new Date().getTime() - startTime[i];			
@@ -784,10 +847,10 @@ function startMove() {
 			let y =
 				routes[i][nextPointIndex[i] - 1].y +
 				(routes[i][nextPointIndex[i]].y - routes[i][nextPointIndex[i] - 1].y) * rate
-			//重绘, 将animatePoint设为轨迹的下一个点, 以达到动态的效果
-			animatePoint[i].x = x
-			animatePoint[i].y = y
 
+				animatePoint[i].x = x;
+				animatePoint[i].y = y;
+			//重绘, 将animatePoint设为轨迹的下一个点, 以达到动态的效果
 			drawPoint(animatePoint[i].x, animatePoint[i].y, tableData[i].type)
 		}
 	}

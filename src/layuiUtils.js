@@ -22,6 +22,30 @@ layui.use(['element', 'layer', 'form','table'], function () {
         element.progress('progress', n + '%');
       }, 1000);
     },
+
+    showLog: function(){
+      var showLog = ``;
+      for(let i = 0; i < logbookInfo.length;i++){
+        showLog += `<p style="margin-top:3px;margin-left:5px;">${logbookInfo[i]}</p>` 
+      }
+      layer.open({
+        type: 1
+        , title: ['查看任务执行时序', 'font-size:18px;']
+        , offset: '300px'
+        , area: ['450px', '350px']
+        , content: showLog
+        , btnAlign: 'c'
+        , shadeClose: true
+        , resize: false
+        ,success: function(layero, index){
+      }
+      ,btn: ['确认']
+      ,yes: function(index, layero){
+        layer.closeAll(); //疯狂模式，关闭所有层
+      }
+      });
+    },
+
     messageComfirm: function () {
       var comfirmDom = `
         <form class="layui-form" style="padding: 10px;" action="" style="margin: 20px 0;">
@@ -71,6 +95,7 @@ layui.use(['element', 'layer', 'form','table'], function () {
         taskEquipment = Number($('input[name="taskEquipment"]:checked').val());
         taskType = Number($('input[name="taskType"]:checked').val());
         initTableData(taskEquipment);
+        initTableDataTaskType(taskType)
         MoveProgress();//动画模拟
         layer.closeAll(); //疯狂模式，关闭所有层
       }
