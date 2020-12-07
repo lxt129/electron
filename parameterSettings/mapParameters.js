@@ -206,7 +206,7 @@ layui.use(['layer','form'], function(){
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人船最大航行距离</label>
+            <label class="layui-form-label">无人船最大航行时间</label>
             <div class="layui-input-block">
                 <input type="text" name="shipMaxTime" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
@@ -224,9 +224,9 @@ layui.use(['layer','form'], function(){
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人潜艇最大航行距离</label>
+            <label class="layui-form-label">无人潜艇最大航行时间</label>
             <div class="layui-input-block">
-                <input type="text" name="submarineMaxTiem" lay-verify="title" autocomplete="off" class="layui-input">
+                <input type="text" name="submarineMaxTime" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
@@ -255,7 +255,7 @@ layui.use(['layer','form'], function(){
                 $('input[name="shipMaxTime"]').val(shipMaxTime);
                 $('input[name="shipMaxLoad"]').val(shipMaxLoad);
                 $('input[name="submarineSpeed"]').val(submarineSpeed);
-                $('input[name="submarineMaxTiem"]').val(submarineMaxTiem);
+                $('input[name="submarineMaxTime"]').val(submarineMaxTime);
                 $('input[name="submarineMaxLoad"]').val(submarineMaxLoad);
             }
             ,btn: ['确认', '重置']
@@ -267,7 +267,7 @@ layui.use(['layer','form'], function(){
                 shipMaxTime = Number($('input[name="shipMaxTime"]').val());
                 shipMaxLoad = Number($('input[name="shipMaxLoad"]').val());
                 submarineSpeed = Number($('input[name="submarineSpeed"]').val());
-                submarineMaxTiem = Number($('input[name="submarineMaxTiem"]').val());
+                submarineMaxTime = Number($('input[name="submarineMaxTime"]').val());
                 submarineMaxLoad = Number($('input[name="submarineMaxLoad"]').val());
                 initTableData();
                 layer.closeAll(); //疯狂模式，关闭所有层
@@ -280,7 +280,7 @@ layui.use(['layer','form'], function(){
                 $('input[name="shipMaxTime"]').val(1000);
                 $('input[name="shipMaxLoad"]').val(2);
                 $('input[name="submarineSpeed"]').val(0.2);
-                $('input[name="submarineMaxTiem"]').val(1000);
+                $('input[name="submarineMaxTime"]').val(1000);
                 $('input[name="submarineMaxLoad"]').val(2);
                 return false;
             }
