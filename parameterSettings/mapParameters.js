@@ -165,14 +165,14 @@ layui.use(['layer','form'], function(){
             }
             ,btn2: function(index, layero){
                 $('#status').text("");
-                $('input[name="total"]').val(10);
+                $('input[name="total"]').val(20);
                 $('input[name="drones"]').val(10);
-                $('input[name="ship"]').val(0);
-                $('input[name="submarine"]').val(0);
-                $('input[name="resourcesTotal"]').val(99);
-                $('input[name="surveyResources"]').val(33);
-                $('input[name="roundUpResources"]').val(33);
-                $('input[name="attackResources"]').val(33);
+                $('input[name="ship"]').val(5);
+                $('input[name="submarine"]').val(5);
+                $('input[name="resourcesTotal"]').val(999);
+                $('input[name="surveyResources"]').val(333);
+                $('input[name="roundUpResources"]').val(333);
+                $('input[name="attackResources"]').val(333);
                 running = false;
                 return false;
             }
@@ -273,15 +273,15 @@ layui.use(['layer','form'], function(){
                 layer.closeAll(); //疯狂模式，关闭所有层
             }
             ,btn2: function(index, layero){
-                $('input[name="droneSpeed"]').val(0.2);
-                $('input[name="droneMaxTime"]').val(1000);
-                $('input[name="droneMaxLoad"]').val(2);
-                $('input[name="shipSpeed"]').val(0.2);
-                $('input[name="shipMaxTime"]').val(1000);
-                $('input[name="shipMaxLoad"]').val(2);
-                $('input[name="submarineSpeed"]').val(0.2);
-                $('input[name="submarineMaxTime"]').val(1000);
-                $('input[name="submarineMaxLoad"]').val(2);
+                $('input[name="droneSpeed"]').val(200);
+                $('input[name="droneMaxTime"]').val(20);
+                $('input[name="droneMaxLoad"]').val(40);
+                $('input[name="shipSpeed"]').val(200);
+                $('input[name="shipMaxTime"]').val(20);
+                $('input[name="shipMaxLoad"]').val(40);
+                $('input[name="submarineSpeed"]').val(200);
+                $('input[name="submarineMaxTime"]').val(20);
+                $('input[name="submarineMaxLoad"]').val(40);
                 return false;
             }
         });
@@ -387,8 +387,8 @@ layui.use(['layer','form'], function(){
                 $(`input[name="roundUpRequirement"][value='2']`).prop("checked",true);
                 $(`input[name="attackRequirement"][value='3']`).prop("checked",true);
                 $('input[name="surveyTime"]').val(0);
-                $('input[name="roundUpTime"]').val(1000);
-                $('input[name="attackTime"]').val(1000);
+                $('input[name="roundUpTime"]').val(1);
+                $('input[name="attackTime"]').val(1);
                 $('input[name="surveyUseResrouce"]').val(1);
                 $('input[name="attackUseResrouce"]').val(2);
                 form.render();

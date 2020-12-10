@@ -107,8 +107,9 @@ layui.use(['element', 'layer', 'form','table'], function () {
       table.render({
         elem: '#table'
         ,height: 490
+        ,limit:50
         ,data: tableData //数据接口
-        ,page: true //开启分页
+        ,page: false //开启分页
         ,cols: [[ //表头
           {
             field: 'id', 
@@ -191,6 +192,43 @@ layui.use(['element', 'layer', 'form','table'], function () {
             }
           },
         ]]
+      });
+    },
+    planning:function(){
+      var planningDom = `
+        <form class="layui-form" style="padding: 10px;" action="" style="margin: 20px 0;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">选择规划路径方案</label>
+            <div class="layui-input-block" style="margin-left: 145px;">
+                <input type="radio" name="planning" value="1" title="智能计算无人机个数">
+                <input type="radio" name="planning" value="2" title="选择无人机个数">
+                <input type="text" name="saleMen" lay-verify="title" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+        </form>
+        `
+      layer.open({
+        type: 1
+        , title: ['选择规划路径方案', 'font-size:18px;']
+        , offset: '300px'
+        , area: ['450px', '350px']
+        , content: planningDom
+        , btnAlign: 'c'
+        , shadeClose: true
+        , resize: false
+        ,success: function(layero, index){
+          $(`input[name="planning"][value=${planning}]`).prop("checked",true);
+          $('input[name="saleMen"]').val(sales);
+          form.render();
+      }
+      ,btn: ['确认']
+      ,yes: function(index, layero){
+        taskProgramme = Number($('input[name="taskProgramme"]:checked').val());
+        taskEquipment = Number($('input[name="taskEquipment"]:checked').val());
+        taskType = Number($('input[name="taskType"]:checked').val());
+
+        layer.closeAll(); //疯狂模式，关闭所有层
+      }
       });
     }
   }
