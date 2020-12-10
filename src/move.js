@@ -9,7 +9,7 @@ let targetNum = [] //计算每条路径上目标点的个数
 let targetPointHit = []; //目标点执行任务情况
 let targetPointSurround = []; //目标点执行任务情况
 let type = [];
-let speed = 200;
+let speed = [];
 let goTaskNumner = 0;
 let status = [];
 let load = [];
@@ -23,15 +23,13 @@ let resource = 0;
 let newAddRoute = [];
 let nextTarget = [];
 let flag = 0;
-let taskFalg = 0;
+let taskFlag = 0;
 let taskFinish = false;
 let taskSort = [];
 let taskStatusIndex = [];
 let endFlag = 0;
 let startPoint;
 let sleep = 0;
-
-let isConflict = [];
 
 let target = 0;
 let drone = 0;
@@ -40,13 +38,17 @@ let drone = 0;
 //move(routes)
 
 function move(routes) {
+	roundUpTime = 1;  //围捕任务所需时间
+	attackTime = 1;   //打击任务所需时间
+	roundUpTime *= 1000;  //围捕任务所需时间
+	attackTime *= 1000;   //打击任务所需时间
 	status = [];
 	load = [];
 	drone = 0;
 	target = 0;
 	newAddRoute = [];
 	nextTarget = [];
-	taskFalg = 0;
+	taskFlag = 0;
 	flag = 0;
 	endFlag = 0;
 	startPoint = {};
@@ -96,6 +98,16 @@ function move(routes) {
 			drawPoint(routes[i][0].x, routes[i][0].y,tableData[i].type)
 		}
 	}
+
+	for(let i = 0;i < tableData.length; i++){
+		if(tableData[i].type == "无人机"){
+			speed[i] = droneSpeed;
+		}else if(tableData[i].type == "无人船"){
+			speed[i] = shipSpeed;
+		}else if(tableData[i].type == "无人潜艇"){
+			speed[i] = submarineSpeed;
+		}
+	}
 	this.startTimer()
 }
 
@@ -132,19 +144,10 @@ let end = 0;
 
 function startMove() {
 	for (let i = 0; i < routes.length; i++) {
-		// if(i == routes.length - 1){
-		// 	if(Number(tableData[i].spendTime) * 1000 < maxTime){
-		// 		maxTime = Number(tableData[i].spendTime) * 1000;
-		// 		console.log(maxTime,"!!!!")
-		// 	}
-		// }
-
-		if(tableData[i].type == "无人机"){
-			speed = droneSpeed;
-		}else if(tableData[i].type == "无人船"){
-			speed = shipSpeed;
-		}else if(tableData[i].type == "无人潜艇"){
-			speed = submarineSpeed;
+		if(i == routes.length - 1){
+			if(Number(tableData[i].spendTime) * 1000 < maxTime){
+				maxTime = Number(tableData[i].spendTime) * 1000;
+			}
 		}
 		
 		tableData[i].currentPosition = "("+~~(animatePoint[i].x) +","+~~(animatePoint[i].y)+")";
@@ -164,14 +167,13 @@ function startMove() {
 			}else{
 				tableData[i].load = submarineMaxLoad;
 			}
-			
-			
 		}else{
 			tableData[i].status = "任务中";
 			if(timeSpent[i] > 0){
 				tableData[i].timeLeft = ~~(tableData[i].spendTime - (new Date().getTime() - timeSpent[i])/1000); 
 			}
-		}
+		}	
+		
 		
 		if(i === 0){
 			tools.initTable();
@@ -181,7 +183,7 @@ function startMove() {
 			//发现目标点后派出无人机 条件一 路径长度 > 1 条件2 上一个点是目标点 条件3 是否为最后一个点  条件4不是探测任务 
 			if (routes[i].length > 0 && routes[i][nextPointIndex[i] - 1].hasOwnProperty('isTarget') == true && nextPointIndex[i] == routes[i].length&& taskType !==1 && targetNum[i] < 3) {
 				//判断有多少个设备到达目标点
-				taskFalg++;
+				taskFlag++;
 				//到达目标点
 				if(targetNum[i] <= 1){
 					if(routes[i][nextPointIndex[i] - 1].isHit >= 0){
@@ -192,11 +194,11 @@ function startMove() {
 				}
 				// 只能访问一次
 				targetNum[i] = targetNum[i] + 3;
-				//console.log(i,taskFalg)
+				//console.log(i,taskFlag)
 				let k = taskType === 2 ? roundUpRequirement : attackRequirement;
 				//设备达到任务要求后执行任务
-				if(taskFalg == newAddRoute.length - taskDeviceIndex*k){
-					taskFalg = 0;
+				if(taskFlag == newAddRoute.length - taskDeviceIndex*k){
+					taskFlag = 0;
 					taskSort.push(routes[i][nextPointIndex[i] - 1])
 					let str = `目标为:(${taskSort[0].x},${taskSort[0].y})的${taskType === 2?"围捕任务":"打击任务"},开始时间为:${formatDate(new Date().getTime())}`
 					logbookInfo.push(str);
@@ -246,7 +248,7 @@ function startMove() {
 			
 			//超时回家 或者 没资源回家
 			if(i === routes.length - 1 && taskFinish && isGoBack == false){
-				let thisTime = new Date().getTime() - timeSpent[i] + distance(routes[i][routes[i].length - 1],routes[0][0])/speed*1000;
+				let thisTime = new Date().getTime() - timeSpent[i] + distance(routes[i][routes[i].length - 1],routes[0][0])/speed[i]*1000;
 				if(thisTime > maxTime){
 					while(k > 0){
 						//console.log(routes.length,key,k)
@@ -263,7 +265,6 @@ function startMove() {
 					}
 					isGoBack = true;
 				}
-				
 			}
 
 			//只让前一轮的设备进行判断
@@ -281,7 +282,7 @@ function startMove() {
 				}
 				point = nextTarget[minIndex];
 
-				let preTime = new Date().getTime() - timeSpent[i] + sleep + (distance(point,routes[i][routes[i].length - 1])+distance(point,routes[0][0]))/speed*1000;
+				let preTime = new Date().getTime() - timeSpent[i] + sleep + (distance(point,routes[i][routes[i].length - 1])+distance(point,routes[0][0]))/speed[i]*1000;
 				
 
 				//超时或者资源不够  资源不够最后一个目标为起点也不执行
@@ -340,7 +341,7 @@ function startMove() {
 			//发现目标点后派出无人机，到达目标点 条件一 路径长度 > 1 条件2 上一个点事目标点  条件3 不是探测任务 
 			if (routes[i].length > 0 && routes[i][nextPointIndex[i] - 1].hasOwnProperty('isTarget') == true && nextPointIndex[i] == routes[i].length&& taskType !==1 && targetNum[i] < 3) {
 				
-				taskFalg++;
+				taskFlag++;
 				if(targetNum[i] <= 1){
 					if(routes[i][nextPointIndex[i] - 1].isHit >= 0){
 						routes[i][nextPointIndex[i] - 1].isHit += 1
@@ -353,20 +354,20 @@ function startMove() {
 				let a = -1;
 				//判断任务是否完成 status[a] = true;为完成
 				if(taskType === 2){
-					if(taskFalg === roundUpRequirement){
+					if(taskFlag === roundUpRequirement){
 						a = Math.floor((i - SALES_MEN)/roundUpRequirement);
 						status[a] = true;
-						taskFalg = 0;
+						taskFlag = 0;
 					}
 				}else if(taskType === 3){
-					if(taskFalg === attackRequirement){
+					if(taskFlag === attackRequirement){
 						a = Math.floor((i - SALES_MEN)/attackRequirement);
 						status[a] = true;
-						taskFalg = 0;
+						taskFlag = 0;
 					}
 				}
 				
-				//console.log(i,taskFalg,status[a])
+				//console.log(i,taskFlag,status[a])
 				//for(let a = 0;a < status.length;a++){
 					if(status[a] === true){
 						//console.log(a)
@@ -433,7 +434,7 @@ function startMove() {
 				if(status[a] === true){
 					d = a;
 					e = a*c + SALES_MEN;
-					let thisTime = new Date().getTime() - timeSpent[e] +distance(routes[e][routes[e].length - 1],routes[0][0])/speed*1000;
+					let thisTime = new Date().getTime() - timeSpent[e] +distance(routes[e][routes[e].length - 1],routes[0][0])/speed[i]*1000;
 					if(thisTime > maxTime){
 						for(let b = 0;b < c;b++){
 							addRoute3(e + b,routes[e + b][routes[e + b].length -1],routes[0][0]);
@@ -542,7 +543,7 @@ function startMove() {
 					let k = roundUpRequirement;
 
 					if(status[0] === true){
-						let thisTime = new Date().getTime() - timeSpent[i] + distance(routes[i][routes[i].length - 1],routes[0][0])/speed*1000;
+						let thisTime = new Date().getTime() - timeSpent[i] + distance(routes[i][routes[i].length - 1],routes[0][0])/speed[i]*1000;
 					}
 					
 
@@ -580,28 +581,24 @@ function startMove() {
 									min = t;
 									indexSelect = a;
 									key = true;
-									if(key === true){
-										let c = indexSelect ;
-										let a = indexSelect * roundUpRequirement + SALES_MEN
-										let thisIndex = indexSelect * roundUpRequirement + SALES_MEN
-										let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed*1000;
-										if(thisTime > maxTime){
-											key = false;
-										}
-									}
 								} 
 							}
 						}
 						
+						if(key === true){
+							let thisIndex = indexSelect * roundUpRequirement + SALES_MEN
+							let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed[i]*1000;
+							if(thisTime > maxTime){
+								key = false;
+							}
+						}
 
 						//判断是否从基地出发最近
 						t = distance(routes[0][0],point);
-						if(t < min && key){
+						if(t * 1.66 < min && key && i < tableData.length - 1 - roundUpRequirement){
 							min = t;
 							indexSelect = 0;
 							key = false;
-						}else{
-							indexSelect = 0;
 						}
 						
 						//从基地派出新的设备
@@ -630,7 +627,6 @@ function startMove() {
 								targetNum[a + b] = 0;
 							}
 							status[c] = false;
-							break;
 						}
 					}
 				}else if (taskType === 3) {//打击任务
@@ -673,20 +669,21 @@ function startMove() {
 									min = t;
 									indexSelect = a;
 									key = true;
-									if(key === true){
-										let thisIndex = indexSelect * attackRequirement + SALES_MEN;
-										let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed*1000;
-										console.log(thisTime)
-										if(thisTime > maxTime){
-											key = false;
-										}
-									}
 								}
 							}
 						}
 
+						if(key === true){
+							let thisIndex = indexSelect * attackRequirement + SALES_MEN;
+							let thisTime = new Date().getTime() - timeSpent[thisIndex] + sleep + (distance(point,routes[thisIndex][routes[thisIndex].length - 1])+distance(point,routes[0][0]))/speed[i]*1000;
+							console.log(thisTime)
+							if(thisTime > maxTime){
+								key = false;
+							}
+						}
+
 						t = distance(routes[0][0],point);
-						if(t < min){
+						if(t * 1.66 < min && i < tableData.length - 1 - attackRequirement ){
 							min = t;
 							indexSelect = 0;
 							key = false;
@@ -767,6 +764,8 @@ function startMove() {
 		)
 
 		if (currentDistance[i] >= targetDistance[i]) {
+
+
 			//利用运动距离与目标距离, 判断运动的点是否超过下一个目标点, 超过了就重置下一个点
 			startTime[i] = new Date().getTime()
 
@@ -780,9 +779,11 @@ function startMove() {
 			if(point.isCenter !== true){
 				surveyShow.push(point);
 				logbook.push(i);
+				 
 				setTimeout(function(){
 					let str = `${logbook[0]}号设备探测目标为:(${surveyShow[0].x},${surveyShow[0].y}),探测时间为:${formatDate(new Date().getTime())}`
 					logbookInfo.push(str);
+					tableData[logbook[0]].load--;
 					logbook.shift();
 					surveyShow.shift();
 				},100)
@@ -805,31 +806,31 @@ function startMove() {
 			continue;
 		} else {
 			//判断路径有无冲突
-			let flag = false;
-			let k = taskType == 3?attackRequirement:roundUpRequirement;
-			if((i >= SALES_MEN && (i - SALES_MEN)%k == 0) || i < SALES_MEN){
-				for(let j = 0;j < routes.length;j++){
-					if(i == j){
-						continue;
-					}
-					if(nextPointIndex[i] > routes[i].length - 1 || nextPointIndex[j] > routes[j].length - 1){
-						continue;
-					}
-					if(taskType == 2){
-						if(j >= SALES_MEN && (j - SALES_MEN)%roundUpRequirement !== 0){
-							continue;
-						}
-					}else if(taskType == 3){
-						if(j >= SALES_MEN && (j - SALES_MEN)%attackRequirement !== 0){
-							continue;
-						}
-					}
-					if(distance(animatePoint[i],animatePoint[j]) < 10* (speed/1000)){
-						console.log("!!!!",distance(animatePoint[i],animatePoint[j]),10* (speed/1000))
-						flag = true;
-					}
-				}
-			}
+			// let flag = false;
+			// let k = taskType == 3?attackRequirement:roundUpRequirement;
+			// if((i >= SALES_MEN && (i - SALES_MEN)%k == 0) || i < SALES_MEN){
+			// 	for(let j = 0;j < routes.length;j++){
+			// 		if(i == j){
+			// 			continue;
+			// 		}
+			// 		if(nextPointIndex[i] > routes[i].length - 1 || nextPointIndex[j] > routes[j].length - 1){
+			// 			break;
+			// 		}
+			// 		if(taskType == 2){
+			// 			if(j >= SALES_MEN && (j - SALES_MEN)%roundUpRequirement !== 0){
+			// 				continue;
+			// 			}
+			// 		}else if(taskType == 3){
+			// 			if(j >= SALES_MEN && (j - SALES_MEN)%attackRequirement !== 0){
+			// 				continue;
+			// 			} 
+			// 		}
+			// 		if(distance(animatePoint[i],animatePoint[j]) < 10* (speed[i]/1000)){
+			// 			console.log("!!!!",distance(animatePoint[i],animatePoint[j]),10* (speed[i]/1000))
+			// 			flag = true;
+			// 		}
+			// 	}
+			// }
 			
 			if(flag && nextPointIndex[0] > 1){
 				startTime[i] = startTime[i] + 60;
@@ -839,7 +840,7 @@ function startMove() {
 			if(deltaTime < 0)
 				deltaTime = 0;
 			
-			let deltaDistance = deltaTime * (speed/1000); 
+			let deltaDistance = deltaTime * (speed[i]/1000); 
 			let rate = deltaDistance / targetDistance[i]
 			let x =
 				routes[i][nextPointIndex[i] - 1].x +

@@ -58,20 +58,20 @@ var total = 20;  //总数
 var drones = 10; //无人机个数
 var ship = 5; //无人船个数
 var submarine = 5;//无人潜艇
-var resourcesTotal = 99 //总资源数
-var surveyResources = 33;//探测资源数量
-var roundUpResources = 33;//围捕资源数量
-var attackResources = 33;//打击资源数量
+var resourcesTotal = 999 //总资源数
+var surveyResources = 333;//探测资源数量
+var roundUpResources = 333;//围捕资源数量
+var attackResources = 333;//打击资源数量
 
 var droneSpeed = 200; //无人机速度
 var droneMaxTime = 20; //无人机最大运动时间
-var droneMaxLoad = 2;  //无人机最大负载
+var droneMaxLoad = 40;  //无人机最大负载
 var shipSpeed = 200; //无人船速度
 var shipMaxTime = 20; //无人船最大运动时间
-var shipMaxLoad = 2;  //无人船最大负载
+var shipMaxLoad = 40;  //无人船最大负载
 var submarineSpeed = 200; //无人潜艇速度
 var submarineMaxTime = 20; //无人潜艇最大运动时间
-var submarineMaxLoad = 2;  //无人潜艇最大负载
+var submarineMaxLoad = 40;  //无人潜艇最大负载
 
 
 
@@ -79,10 +79,10 @@ var surveyRequirement = 1; 	//探测任务需要设备
 var roundUpRequirement = 2;	//围捕任务需要设备
 var attackRequirement = 3;	//打击任务需要设备
 var surveyTime = 0;   //探测任务所需时间
-var roundUpTime = 1000;  //围捕任务所需时间
-var attackTime = 1000;   //打击任务所需时间
-var surveyUseResrouce = 0; //探测任务所需资源
-var attackUseResrouce = 2; //打击任务所需资源
+var roundUpTime = 1;  //围捕任务所需时间
+var attackTime = 1;   //打击任务所需时间
+var surveyUseResrouce = 1; //探测任务所需资源
+var attackUseResrouce = 10; //打击任务所需资源
 //var roundUpUseResrouce = 0
 
 var taskProgramme = 1;//任务方案
@@ -90,6 +90,9 @@ var taskEquipment = 1;//任务设备
 var taskType = 1; //任务类型（1探测、2围捕、3打击）
 // var hitRate = 50
 // var surroundRate = 35
+
+var planning = 1;
+var sales = 2;
 var tableData = [];
 
 //记录探测时机和围捕打击时机
@@ -110,7 +113,7 @@ $(function () {
 		if (points.length >= 3) {
 			initData();
 			GAInitialize();
-			while (currentGeneration <= 1000) {
+			while (currentGeneration <= 300) {
 				GANextGeneration();
 			}
 			//判断大致需要的无人设备数量
