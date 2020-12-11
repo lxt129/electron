@@ -6,9 +6,18 @@ function init() {
 	HEIGHT = $('#canvas').height();
 
 	//每隔10ms,调用draw()进行画图
-	setInterval(draw, 10);
+	donghua();
+	//setInterval(draw, 10);
+	
 	//监听鼠标事件
 	init_mouse();
+}
+
+let dongh;
+function donghua(){
+	window.cancelAnimationFrame(dongh)
+	dongh = window.requestAnimationFrame(donghua);
+	draw();
 }
 
 function init_mouse() {

@@ -79,8 +79,8 @@ var surveyRequirement = 1; 	//探测任务需要设备
 var roundUpRequirement = 2;	//围捕任务需要设备
 var attackRequirement = 3;	//打击任务需要设备
 var surveyTime = 0;   //探测任务所需时间
-var roundUpTime = 1;  //围捕任务所需时间
-var attackTime = 1;   //打击任务所需时间
+var roundUpTime = 1000;  //围捕任务所需时间
+var attackTime = 1000;   //打击任务所需时间
 var surveyUseResrouce = 1; //探测任务所需资源
 var attackUseResrouce = 10; //打击任务所需资源
 //var roundUpUseResrouce = 0
@@ -113,8 +113,9 @@ $(function () {
 		if (points.length >= 3) {
 			initData();
 			GAInitialize();
-			while (currentGeneration <= 300) {
+			while (currentGeneration <= 200) {
 				GANextGeneration();
+				console.log(currentGeneration);
 			}
 			//判断大致需要的无人设备数量
 			SALES_MEN = Math.ceil(routeLenth / (droneSpeed * (droneMaxTime * 0.8)));
@@ -164,7 +165,7 @@ $(function () {
 		console.log(max, droneSpeed * droneMaxTime)
 		if (max > droneSpeed * droneMaxTime) {
 			layer.msg('路线超过设备的最大行驶距离，已为您重新规划路径！', { icon: 5 });
-			SALES_MEN++
+			SALES_MEN++;
 			MTSP();
 		}
 		$("#infoDiv").empty();
@@ -322,35 +323,24 @@ function draw() {
 		GANextGeneration();
 		$('#status').html(
 			`
-		<p>一共有${points.length - 1}个收搜地点和${SALES_MEN}架无人机</p>
-		<p>第${currentGeneration}代收搜结果.和${mutationTimes}次变异</p> 
-		<p>最佳评价值:${~~(bestValue)}.路径长度${routeLenth}</p> 
+		<p>第${currentGeneration}代收搜结果</p>
 		`
 		)
 	} else if (running === false && currentGeneration !== 0) {
 		$('#status').html(
 			`
-		<p>一共有${points.length - 1}个收搜地点和${SALES_MEN}架无人机</p>
-		<p>第${currentGeneration}代收搜结果.和${mutationTimes}次变异</p> 
-		<p>最佳评价值:${~~(bestValue)}.路径长度${routeLenth}</p> 
+	
+		<p>第${currentGeneration}代收搜结果</p>
 		`
 		)
 		// Nilai mutasinya adalah 
 	} else {
-		$('#status').html(`<p>一共有${points.length}个收搜地点和${SALES_MEN}架无人机</p>`);
+		$('#status').html(`<p>未开始</p>`);
 	}
 	clearCanvas();
 	drawGrid();
-	//画障碍
-	// if (hidden.length > 0) {
-	// 	for (var i = 0; i < hidden.length; i++) {
-	// 		drawHiddenArea(hidden[i]);
-	// 	}
-	// }
-	//画探测时机
 	if (surveyShow.length > 0) {
 		for (let i = 0; i < surveyShow.length; i++) {
-			//console.log("!!!!!")
 			drawSurveyShow(surveyShow[i]);
 		}
 	}

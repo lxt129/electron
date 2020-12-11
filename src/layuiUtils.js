@@ -194,6 +194,11 @@ layui.use(['element', 'layer', 'form','table'], function () {
         ]]
       });
     },
+    reload: function(){
+      table.reload('table', {
+        data: tableData //数据接口
+      });
+    },
     planning:function(){
       var planningDom = `
         <form class="layui-form" style="padding: 10px;" action="" style="margin: 20px 0;">

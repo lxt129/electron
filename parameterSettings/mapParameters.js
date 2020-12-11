@@ -301,7 +301,7 @@ layui.use(['layer','form'], function(){
         <div class="layui-form-item">
             <label class="layui-form-label">探测任务所需时间</label>
             <div class="layui-input-block">
-                <input type="text" name="surveyTime" lay-verify="number" autocomplete="off" class="layui-input">
+                <input type="text" name="surveyTime" lay-verify="number" autocomplete="off" class="layui-input layui-disabled">
             </div>
         </div>
         <div class="layui-form-item">
@@ -359,9 +359,9 @@ layui.use(['layer','form'], function(){
                 $(`input[name="surveyRequirement"][value=${surveyRequirement}]`).prop("checked",true);
                 $(`input[name="roundUpRequirement"][value=${roundUpRequirement}]`).prop("checked",true);
                 $(`input[name="attackRequirement"][value=${attackRequirement}]`).prop("checked",true);
-                $('input[name="surveyTime"]').val(surveyTime);
-                $('input[name="roundUpTime"]').val(roundUpTime);
-                $('input[name="attackTime"]').val(attackTime);
+                $('input[name="surveyTime"]').val(surveyTime/1000);
+                $('input[name="roundUpTime"]').val(roundUpTime/1000);
+                $('input[name="attackTime"]').val(attackTime/1000);
                 $('input[name="surveyUseResrouce"]').val(surveyUseResrouce);
                 $('input[name="attackUseResrouce"]').val(attackUseResrouce);
                 form.render();
@@ -375,9 +375,9 @@ layui.use(['layer','form'], function(){
                 surveyRequirement = Number($('input[name="surveyRequirement"]:checked').val());
                 roundUpRequirement = Number($('input[name="roundUpRequirement"]:checked').val());
                 attackRequirement = Number($('input[name="attackRequirement"]:checked').val());
-                surveyTime = Number($('input[name="surveyTime"]').val());
-                roundUpTime = Number($('input[name="roundUpTime"]').val());
-                attackTime = Number($('input[name="attackTime"]').val());
+                surveyTime = Number($('input[name="surveyTime"]').val()) * 1000;
+                roundUpTime = Number($('input[name="roundUpTime"]').val()) * 1000;
+                attackTime = Number($('input[name="attackTime"]').val()) * 1000;
                 surveyUseResrouce = Number($('input[name="surveyUseResrouce"]').val());
                 attackUseResrouce = Number($('input[name="attackUseResrouce"]').val());
                 layer.closeAll(); //疯狂模式，关闭所有层

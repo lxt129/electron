@@ -38,10 +38,6 @@ let drone = 0;
 //move(routes)
 
 function move(routes) {
-	roundUpTime = 1;  //围捕任务所需时间
-	attackTime = 1;   //打击任务所需时间
-	roundUpTime *= 1000;  //围捕任务所需时间
-	attackTime *= 1000;   //打击任务所需时间
 	status = [];
 	load = [];
 	drone = 0;
@@ -176,7 +172,7 @@ function startMove() {
 		
 		
 		if(i === 0){
-			tools.initTable();
+			tools.reload();
 		}
 		//------------------------------------------资源最少方案------------------------------------------
 		if(taskProgramme === 1){
