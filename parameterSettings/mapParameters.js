@@ -21,6 +21,7 @@ layui.use(['layer','form'], function(){
                 <input type="text" name="width_X" lay-verify="title" autocomplete="off" placeholder="默认收搜宽40" class="layui-input">
             </div>
         </div>
+        <div style="text-align: center" class="layui-word-aux"><label>比例：1=100m</label></div>
     </form>
     `
     $('#mapBtn').click(function(){
@@ -28,7 +29,7 @@ layui.use(['layer','form'], function(){
             type: 1
             ,title: ['区域设置', 'font-size:18px;']
             ,offset:  '300px'
-            ,area: ['400px', '300px']
+            ,area: ['400px', '310px']
             ,content: mapDom
             ,btnAlign: 'c'
             ,shadeClose:true
@@ -42,6 +43,10 @@ layui.use(['layer','form'], function(){
             }
             ,btn: ['确认', '重置']
             ,yes: function(index, layero){
+                if(Number($('input[name="area_y"]').val()) <= 0 || Number($('input[name="height_Y"]').val()) <= 0 || Number($('input[name="width_X"]').val()) <= 0){
+                    layer.msg('参数不能小于0！', {icon: 5}); 
+                    return;
+                }
                 area_x = Number($('input[name="area_y"]').val());
                 area_y = Number($('input[name="area_y"]').val());
                 height_Y = Number($('input[name="height_Y"]').val());
@@ -102,12 +107,7 @@ layui.use(['layer','form'], function(){
                 <input type="text" name="surveyResources" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">围捕资源数量</label>
-            <div class="layui-input-block">
-                <input type="text" name="roundUpResources" lay-verify="title" autocomplete="off" class="layui-input">
-            </div>
-        </div>
+       
         <div class="layui-form-item">
             <label class="layui-form-label">打击资源数量</label>
             <div class="layui-input-block">
@@ -116,12 +116,18 @@ layui.use(['layer','form'], function(){
         </div>
     </form>
     `
+    // <div class="layui-form-item">
+    // <label class="layui-form-label">围捕资源数量</label>
+    // <div class="layui-input-block">
+    //     <input type="text" name="roundUpResources" lay-verify="title" autocomplete="off" class="layui-input">
+    // </div>
+    // </div>
     $('#resBtn').click(function(){
         layer.open({
             type: 1
             ,title: ['设置设备资源', 'font-size:18px;']
             ,offset:  '300px'
-            ,area: ['500px', '550px']
+            ,area: ['500px', '530px']
             ,content: resDom
             ,btnAlign: 'c'
             ,shadeClose:true
@@ -134,7 +140,7 @@ layui.use(['layer','form'], function(){
                 $('input[name="submarine"]').val(submarine);
                 $('input[name="resourcesTotal"]').val(resourcesTotal);
                 $('input[name="surveyResources"]').val(surveyResources);
-                $('input[name="roundUpResources"]').val(roundUpResources);
+                //$('input[name="roundUpResources"]').val(roundUpResources);
                 $('input[name="attackResources"]').val(attackResources);
                 
             }
@@ -145,8 +151,14 @@ layui.use(['layer','form'], function(){
                     layer.msg('无人平台数需要等于各个平台数相加！', {icon: 5}); 
                     return;
                 }else if(Number($('input[name="resourcesTotal"]').val()) !=  Number($('input[name="surveyResources"]').val()) + 
-                Number($('input[name="roundUpResources"]').val()) + Number($('input[name="attackResources"]').val())){
+                Number($('input[name="attackResources"]').val())){
                     layer.msg('总资源数需要等于各个资源数相加！', {icon: 5}); 
+                    return;
+                }
+                if(Number($('input[name="total"]').val()) <= 0 ||Number($('input[name="drones"]').val()) < 0 || Number($('input[name="ship"]').val()) < 0
+                || Number($('input[name="submarine"]').val()) < 0 || Number($('input[name="resourcesTotal"]').val()) < 0 ||
+                Number($('input[name="surveyResources"]').val()) < 0 || Number($('input[name="attackResources"]').val()) < 0){
+                    layer.msg('参数不能小于0！', {icon: 5}); 
                     return;
                 }
                 $('#status').text("");
@@ -156,7 +168,7 @@ layui.use(['layer','form'], function(){
                 submarine = Number($('input[name="submarine"]').val());
                 resourcesTotal = Number($('input[name="resourcesTotal"]').val());
                 surveyResources = Number($('input[name="surveyResources"]').val());
-                roundUpResources = Number($('input[name="roundUpResources"]').val());
+                //roundUpResources = Number($('input[name="roundUpResources"]').val());
                 attackResources = Number($('input[name="attackResources"]').val());
                 running = false;
                 //更新数据表格
@@ -169,10 +181,10 @@ layui.use(['layer','form'], function(){
                 $('input[name="drones"]').val(10);
                 $('input[name="ship"]').val(5);
                 $('input[name="submarine"]').val(5);
-                $('input[name="resourcesTotal"]').val(999);
-                $('input[name="surveyResources"]').val(333);
-                $('input[name="roundUpResources"]').val(333);
-                $('input[name="attackResources"]').val(333);
+                $('input[name="resourcesTotal"]').val(1000);
+                $('input[name="surveyResources"]').val(500);
+                //$('input[name="roundUpResources"]').val(333);
+                $('input[name="attackResources"]').val(500);
                 running = false;
                 return false;
             }
@@ -260,6 +272,21 @@ layui.use(['layer','form'], function(){
             }
             ,btn: ['确认', '重置']
             ,yes: function(index, layero){
+                if(Number($('input[name="droneSpeed"]').val()) < 40 ||  Number($('input[name="shipSpeed"]').val()) < 40
+                || Number($('input[name="submarineSpeed"]').val()) < 40){
+                    layer.msg('设备的速度不能低于40！请重新设置', {icon: 5}); 
+                    return;
+                }
+                if(Number($('input[name="droneSpeed"]').val()) > 300 ||  Number($('input[name="shipSpeed"]').val()) > 300
+                || Number($('input[name="submarineSpeed"]').val()) > 300){
+                    layer.msg('设备的速度不能高于300！请重新设置', {icon: 5}); 
+                    return;
+                }
+                if(Number($('input[name="droneMaxTime"]').val()) < 15 || Number($('input[name="shipMaxTime"]').val()) < 15
+                || Number($('input[name="submarineMaxTime"]').val()) < 15){
+                    layer.msg('设备的最大运行时间不能低于15！请重新设置', {icon: 5}); 
+                    return;
+                }
                 droneSpeed = Number($('input[name="droneSpeed"]').val());
                 droneMaxTime = Number($('input[name="droneMaxTime"]').val());
                 droneMaxLoad = Number($('input[name="droneMaxLoad"]').val());
@@ -294,8 +321,6 @@ layui.use(['layer','form'], function(){
             <label class="layui-form-label">探测任务最小完成条件</label>
             <div class="layui-input-block">
                 <input type="radio" name="surveyRequirement" value="1" title="1架设备">
-                <input type="radio" name="surveyRequirement" value="2" title="2架设备">
-                <input type="radio" name="surveyRequirement" value="3" title="3架设备">
             </div>
         </div>
         <div class="layui-form-item">
@@ -370,6 +395,21 @@ layui.use(['layer','form'], function(){
             ,yes: function(index, layero){
                 if(droneMaxLoad * Number($('input[name="attackRequirement"]:checked').val()) < Number($('input[name="attackUseResrouce"]').val())){
                     layer.msg('设备没有足够资源去完成任务！请重新设置', {icon: 5}); 
+                    return;
+                }
+                if(Number($('input[name="surveyTime"]').val()) > 5 || Number($('input[name="roundUpTime"]').val()) > 5
+                || Number($('input[name="attackTime"]').val()) > 5){
+                    layer.msg('设备完成任务时间不能超过5！请重新设置', {icon: 5}); 
+                    return;
+                }
+                if(Number($('input[name="surveyUseResrouce"]').val()) > 10 || Number($('input[name="attackUseResrouce"]').val()) > 10){
+                    layer.msg('设备完成任务消耗资源不能超过10！请重新设置', {icon: 5}); 
+                    return;
+                }
+                if(Number($('input[name="surveyTime"]').val())  < 0|| Number($('input[name="roundUpTime"]').val()) < 0
+                || Number($('input[name="attackTime"]').val()) < 0 || Number($('input[name="surveyUseResrouce"]').val()) < 0
+                ||  Number($('input[name="attackUseResrouce"]').val()) < 0){
+                    layer.msg('参数不能小于0！请重新设置', {icon: 5}); 
                     return;
                 }
                 surveyRequirement = Number($('input[name="surveyRequirement"]:checked').val());

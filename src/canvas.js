@@ -90,6 +90,9 @@ function drawCircle(point) {
 	if (point.hasOwnProperty('isCenter')) {
 		ctx.fillStyle = '#0f0';
 		ctx.arc(point.x, point.y, 3, 0, Math.PI * 2, true);
+		var img = document.getElementById("base");
+		let min =  height_Y > width_X ? width_X : height_Y;
+		ctx.drawImage(img,point.x - min/2,point.y - min/2,min,min);
 	} else if(point.hasOwnProperty('isComplete')){
 		ctx.fillStyle = '#000';
 		ctx.arc(point.x, point.y, 3, 0, Math.PI * 2, true);

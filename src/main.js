@@ -58,10 +58,10 @@ var total = 20;  //总数
 var drones = 10; //无人机个数
 var ship = 5; //无人船个数
 var submarine = 5;//无人潜艇
-var resourcesTotal = 999 //总资源数
-var surveyResources = 333;//探测资源数量
+var resourcesTotal = 1000 //总资源数
+var surveyResources = 500;//探测资源数量
 var roundUpResources = 333;//围捕资源数量
-var attackResources = 333;//打击资源数量
+var attackResources = 500;//打击资源数量
 
 var droneSpeed = 200; //无人机速度
 var droneMaxTime = 20; //无人机最大运动时间

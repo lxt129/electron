@@ -626,7 +626,6 @@ function startMove() {
 						}
 					}
 				}else if (taskType === 3) {//打击任务
-					console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 					addinfo("进行打击任务");
 					routes[i][nextPointIndex[i] - 1].isHit = 0;
 					targetPointHit.push(routes[i][nextPointIndex[i] - 1]);
