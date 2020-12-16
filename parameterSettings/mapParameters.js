@@ -56,6 +56,13 @@ layui.use(['layer','form'], function(){
                 points = [];
                 running = false;
                 drawGrid();
+
+                varData.area_x = area_x;
+                varData.area_y = area_y;
+                varData.height_Y = height_Y;
+                varData.width_X = width_X;
+                let data = JSON.stringify(varData);
+                fs.writeFileSync('./render/var.json', data);
                 layer.closeAll(); //疯狂模式，关闭所有层
             }
             ,btn2: function(index, layero){
@@ -173,6 +180,17 @@ layui.use(['layer','form'], function(){
                 running = false;
                 //更新数据表格
                 initTableData();
+
+                varData.total = total;
+                varData.drones = drones;
+                varData.ship = ship;
+                varData.submarine = submarine;
+                varData.resourcesTotal = resourcesTotal;
+                varData.surveyResources = surveyResources;
+                varData.attackResources = attackResources;
+                let data = JSON.stringify(varData);
+                fs.writeFileSync('./render/var.json', data);
+
                 layer.closeAll(); //疯狂模式，关闭所有层
             }
             ,btn2: function(index, layero){
@@ -297,6 +315,19 @@ layui.use(['layer','form'], function(){
                 submarineMaxTime = Number($('input[name="submarineMaxTime"]').val());
                 submarineMaxLoad = Number($('input[name="submarineMaxLoad"]').val());
                 initTableData();
+
+                varData.droneSpeed = droneSpeed;
+                varData.droneMaxTime = droneMaxTime;
+                varData.droneMaxLoad = droneMaxLoad;
+                varData.shipSpeed = shipSpeed;
+                varData.shipMaxTime = shipMaxTime;
+                varData.shipMaxLoad = shipMaxLoad;
+                varData.submarineSpeed = submarineSpeed;
+                varData.submarineMaxTime = submarineMaxTime;
+                varData.submarineMaxLoad = submarineMaxLoad;
+                let data = JSON.stringify(varData);
+                fs.writeFileSync('./render/var.json', data);
+
                 layer.closeAll(); //疯狂模式，关闭所有层
             }
             ,btn2: function(index, layero){
@@ -326,7 +357,7 @@ layui.use(['layer','form'], function(){
         <div class="layui-form-item">
             <label class="layui-form-label">探测任务所需时间</label>
             <div class="layui-input-block">
-                <input type="text" name="surveyTime" lay-verify="number" autocomplete="off" class="layui-input layui-disabled">
+                <input type="text" name="surveyTime" lay-verify="number" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
@@ -412,6 +443,10 @@ layui.use(['layer','form'], function(){
                     layer.msg('参数不能小于0！请重新设置', {icon: 5}); 
                     return;
                 }
+                // if(Number($('input[name="surveyRequirement"]:checked').val()) > 1){
+                //     layer.msg('探测时间不能超过1秒！请重新设置', {icon: 5}); 
+                //     return;
+                // }
                 surveyRequirement = Number($('input[name="surveyRequirement"]:checked').val());
                 roundUpRequirement = Number($('input[name="roundUpRequirement"]:checked').val());
                 attackRequirement = Number($('input[name="attackRequirement"]:checked').val());
@@ -420,6 +455,18 @@ layui.use(['layer','form'], function(){
                 attackTime = Number($('input[name="attackTime"]').val()) * 1000;
                 surveyUseResrouce = Number($('input[name="surveyUseResrouce"]').val());
                 attackUseResrouce = Number($('input[name="attackUseResrouce"]').val());
+
+                varData.surveyRequirement = surveyRequirement;
+                varData.roundUpRequirement = roundUpRequirement;
+                varData.attackRequirement = attackRequirement;
+                varData.surveyTime = surveyTime;
+                varData.roundUpTime = roundUpTime;
+                varData.attackTime = attackTime;
+                varData.surveyUseResrouce = surveyUseResrouce;
+                varData.attackUseResrouce = attackUseResrouce;
+                let data = JSON.stringify(varData);
+                fs.writeFileSync('./render/var.json', data);
+
                 layer.closeAll(); //疯狂模式，关闭所有层
             }
             ,btn2: function(index, layero){
