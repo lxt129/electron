@@ -10,13 +10,13 @@ layui.use(['layer','form'], function(){
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人机收搜范围长</label>
+            <label class="layui-form-label">无人平台收搜范围长</label>
             <div class="layui-input-block">
                 <input type="text" name="height_Y" lay-verify="title" autocomplete="off" placeholder="默认收搜长40" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人机收搜范围宽</label>
+            <label class="layui-form-label">无人平台收搜范围宽</label>
             <div class="layui-input-block">
                 <input type="text" name="width_X" lay-verify="title" autocomplete="off" placeholder="默认收搜宽40" class="layui-input">
             </div>
@@ -29,7 +29,7 @@ layui.use(['layer','form'], function(){
             type: 1
             ,title: ['区域设置', 'font-size:18px;']
             ,offset:  '300px'
-            ,area: ['400px', '310px']
+            ,area: ['400px', '350px']
             ,content: mapDom
             ,btnAlign: 'c'
             ,shadeClose:true
@@ -56,6 +56,8 @@ layui.use(['layer','form'], function(){
                 points = [];
                 running = false;
                 drawGrid();
+                //改变比例
+                ratio = area_y / 800;
 
                 varData.area_x = area_x;
                 varData.area_y = area_y;
@@ -91,13 +93,13 @@ layui.use(['layer','form'], function(){
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人船数量</label>
+            <label class="layui-form-label">无人艇数量</label>
             <div class="layui-input-block">
                 <input type="text" name="ship" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人潜艇数量</label>
+            <label class="layui-form-label">无人潜航器数量</label>
             <div class="layui-input-block">
                 <input type="text" name="submarine" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
@@ -153,6 +155,10 @@ layui.use(['layer','form'], function(){
             }
             ,btn: ['确认', '重置']
             ,yes: function(index, layero){
+                if(Number($('input[name="total"]').val()) < 6){
+                    layer.msg('无人平台数不能少于6！', {icon: 5}); 
+                    return;
+                }
                 if(Number($('input[name="total"]').val()) != Number($('input[name="drones"]').val()) + 
                 Number($('input[name="ship"]').val()) + Number($('input[name="submarine"]').val())){
                     layer.msg('无人平台数需要等于各个平台数相加！', {icon: 5}); 
@@ -168,6 +174,7 @@ layui.use(['layer','form'], function(){
                     layer.msg('参数不能小于0！', {icon: 5}); 
                     return;
                 }
+                
                 $('#status').text("");
                 total = Number($('input[name="total"]').val());
                 drones = Number($('input[name="drones"]').val());
@@ -230,37 +237,37 @@ layui.use(['layer','form'], function(){
             </div>
         </div>
          <div class="layui-form-item">
-            <label class="layui-form-label">无人船速度</label>
+            <label class="layui-form-label">无人艇速度</label>
             <div class="layui-input-block">
                 <input type="text" name="shipSpeed" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人船最大航行时间</label>
+            <label class="layui-form-label">无人艇最大航行时间</label>
             <div class="layui-input-block">
                 <input type="text" name="shipMaxTime" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人船最大负载</label>
+            <label class="layui-form-label">无人艇最大负载</label>
             <div class="layui-input-block">
                 <input type="text" name="shipMaxLoad" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人潜艇速度</label>
+            <label class="layui-form-label">无人潜航器速度</label>
             <div class="layui-input-block">
                 <input type="text" name="submarineSpeed" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人潜艇最大航行时间</label>
+            <label class="layui-form-label">无人潜航器最大航行时间</label>
             <div class="layui-input-block">
                 <input type="text" name="submarineMaxTime" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">无人潜艇最大负载</label>
+            <label class="layui-form-label">无人潜航器最大负载</label>
             <div class="layui-input-block">
                 <input type="text" name="submarineMaxLoad" lay-verify="title" autocomplete="off" class="layui-input">
             </div>
@@ -271,7 +278,7 @@ layui.use(['layer','form'], function(){
         layer.open({
             type: 1
             ,title: ['设置设备资源参数', 'font-size:18px;']
-            ,area: ['500px', '665px']
+            ,area: ['500px', '685px']
             ,content: resParametersDom
             ,btnAlign: 'c'
             ,shadeClose:true
@@ -428,9 +435,9 @@ layui.use(['layer','form'], function(){
                     layer.msg('设备没有足够资源去完成任务！请重新设置', {icon: 5}); 
                     return;
                 }
-                if(Number($('input[name="surveyTime"]').val()) > 5 || Number($('input[name="roundUpTime"]').val()) > 5
-                || Number($('input[name="attackTime"]').val()) > 5){
-                    layer.msg('设备完成任务时间不能超过5！请重新设置', {icon: 5}); 
+                if(Number($('input[name="surveyTime"]').val()) > 3 || Number($('input[name="roundUpTime"]').val()) > 3
+                || Number($('input[name="attackTime"]').val()) > 3){
+                    layer.msg('设备完成任务时间不能超过3！请重新设置', {icon: 5}); 
                     return;
                 }
                 if(Number($('input[name="surveyUseResrouce"]').val()) > 10 || Number($('input[name="attackUseResrouce"]').val()) > 10){

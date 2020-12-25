@@ -59,8 +59,8 @@ var titik3_mut = 0.01;
 var SALES_MEN = 1; //基地个数
 var total = 20;  //总数
 var drones = 10; //无人机个数
-var ship = 5; //无人船个数
-var submarine = 5;//无人潜艇
+var ship = 5; //无人艇个数
+var submarine = 5;//无人潜航器
 var resourcesTotal = 1000 //总资源数
 var surveyResources = 500;//探测资源数量
 //var roundUpResources = 333;//围捕资源数量
@@ -69,12 +69,12 @@ var attackResources = 500;//打击资源数量
 var droneSpeed = 200; //无人机速度
 var droneMaxTime = 25; //无人机最大运动时间
 var droneMaxLoad = 40;  //无人机最大负载
-var shipSpeed = 200; //无人船速度
-var shipMaxTime = 25; //无人船最大运动时间
-var shipMaxLoad = 40;  //无人船最大负载
-var submarineSpeed = 200; //无人潜艇速度
-var submarineMaxTime = 25; //无人潜艇最大运动时间
-var submarineMaxLoad = 40;  //无人潜艇最大负载
+var shipSpeed = 200; //无人艇速度
+var shipMaxTime = 25; //无人艇最大运动时间
+var shipMaxLoad = 40;  //无人艇最大负载
+var submarineSpeed = 200; //无人潜航器速度
+var submarineMaxTime = 25; //无人潜航器最大运动时间
+var submarineMaxLoad = 40;  //无人潜航器最大负载
 
 
 
@@ -112,8 +112,8 @@ $(function () {
 			width_X = 40;
 			total = 20;  //总数
 			drones = 10; //无人机个数
-			ship = 5; //无人船个数
-			submarine = 5;//无人潜艇
+			ship = 5; //无人艇个数
+			submarine = 5;//无人潜航器
 			resourcesTotal = 1000 //总资源数
 			surveyResources = 500;//探测资源数量
 			//roundUpResources = 333;//围捕资源数量
@@ -122,12 +122,12 @@ $(function () {
 			droneSpeed = 200; //无人机速度
 			droneMaxTime = 25; //无人机最大运动时间
 			droneMaxLoad = 40;  //无人机最大负载
-			shipSpeed = 200; //无人船速度
-			shipMaxTime = 25; //无人船最大运动时间
-			shipMaxLoad = 40;  //无人船最大负载
-			submarineSpeed = 200; //无人潜艇速度
-			submarineMaxTime = 25; //无人潜艇最大运动时间
-			submarineMaxLoad = 40;  //无人潜艇最大负载
+			shipSpeed = 200; //无人艇速度
+			shipMaxTime = 25; //无人艇最大运动时间
+			shipMaxLoad = 40;  //无人艇最大负载
+			submarineSpeed = 200; //无人潜航器速度
+			submarineMaxTime = 25; //无人潜航器最大运动时间
+			submarineMaxLoad = 40;  //无人潜航器最大负载
 
 
 
@@ -147,8 +147,8 @@ $(function () {
 			varData.width_X = 40;
 			varData.total = 20;  //总数
 			varData.drones = 10; //无人机个数
-			varData.ship = 5; //无人船个数
-			varData.submarine = 5;//无人潜艇
+			varData.ship = 5; //无人艇个数
+			varData.submarine = 5;//无人潜航器
 			varData.resourcesTotal = 1000 //总资源数
 			varData.surveyResources = 500;//探测资源数量
 			
@@ -156,12 +156,12 @@ $(function () {
 			varData.droneSpeed = 200; //无人机速度
 			varData.droneMaxTime = 25; //无人机最大运动时间
 			varData.droneMaxLoad = 40;  //无人机最大负载
-			varData.shipSpeed = 200; //无人船速度
-			varData.shipMaxTime = 25; //无人船最大运动时间
-			varData.shipMaxLoad = 40;  //无人船最大负载
-			varData.submarineSpeed = 200; //无人潜艇速度
-			varData.submarineMaxTime = 25; //无人潜艇最大运动时间
-			varData.submarineMaxLoad = 40;  //无人潜艇最大负载
+			varData.shipSpeed = 200; //无人艇速度
+			varData.shipMaxTime = 25; //无人艇最大运动时间
+			varData.shipMaxLoad = 40;  //无人艇最大负载
+			varData.submarineSpeed = 200; //无人潜航器速度
+			varData.submarineMaxTime = 25; //无人潜航器最大运动时间
+			varData.submarineMaxLoad = 40;  //无人潜航器最大负载
 			varData.surveyRequirement = 1; 	//探测任务需要设备
 			varData.roundUpRequirement = 2;	//围捕任务需要设备
 			varData.attackRequirement = 2;	//打击任务需要设备
@@ -210,27 +210,28 @@ $(function () {
 			attackUseResrouce = varData.attackUseResrouce
 		}
 	})
-	
+	//全局初始化
 	init();
+	//算法数据初始化
 	initData();
-
+	//随机增加目标点
 	$('#addRandom_btn').click(function () {
 		addRandomPoints(20);
 		$('#status').text("");
 		running = false;
 	});
-
+	//规划路线
 	$('#start_btn').click(function () {
 		tools.planning();
 	});
-
+	//算法第一轮运行
 	function MTSP() {
 		initData();
 		GAInitialize();
 		running = true;
 		drawHidden = false;
 	}
-
+	//重置按钮
 	$('#clear_btn').click(function () {
 		running === false;
 		initData();
@@ -239,6 +240,7 @@ $(function () {
 		targetPointHit = new Array();
 		targetPointSurround = new Array();
 	});
+	//暂停、继续按钮
 	$('#stop_btn').click(function () {
 		if (running === false && currentGeneration !== 0) {
 			running = true;
@@ -250,6 +252,7 @@ $(function () {
 	// 	drawHidden = !drawHidden;
 	// 	drawAvoidHidden(best);
 	// })
+	//执行任务动画
 	$('#move').click(function () {
 		logbookInfo = [];
 		logbook = [];
@@ -309,12 +312,13 @@ $(function () {
 	// 	SALES_MEN = 1;
 	// 	MTSP();
 	// })
-
+	//显示时序
 	$('#showLog').click(function () {
 		tools.showLog();
 	})
 });
 
+//执行任务之前判断操作
 function MoveProgress() {
 	//maxSubPath = getMaxSubPath(best, SALES_MEN) 
 	// let htmllet = `
@@ -475,61 +479,134 @@ function draw() {
 
 //初始化数据表格
 function initTableData(taskEquipment) {
+	let currentresourcesTotal = resourcesTotal;
 	tableData = [];
 	if (taskEquipment == 1) {
 		let i = 0;
 		for (i; i < drones; i++) {
-			var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, droneMaxLoad, droneMaxTime, null, "未启用");
+			if(currentresourcesTotal > droneMaxLoad){
+				currentresourcesTotal -= droneMaxLoad;
+				var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, droneMaxLoad, droneMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, currentresourcesTotal, droneMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 		for (i; i < drones + ship; i++) {
-			var deviceInfo = new info(i + 1, "无人船", null, null, shipSpeed, null, shipMaxLoad, shipMaxTime, null, "未启用");
+			if(currentresourcesTotal > shipMaxLoad){
+				currentresourcesTotal -= shipMaxLoad;
+				var deviceInfo = new info(i + 1, "无人艇", null, null, shipSpeed, null, shipMaxLoad, shipMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人艇", null, null, shipSpeed, null, currentresourcesTotal, shipMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 		for (i; i < drones + ship + submarine; i++) {
-			var deviceInfo = new info(i + 1, "无人潜艇", null, null, submarineSpeed, null, submarineMaxLoad, submarineMaxTime, null, "未启用");
+			if(currentresourcesTotal > submarineMaxLoad){
+				currentresourcesTotal -= submarineMaxLoad;
+				var deviceInfo = new info(i + 1, "无人潜航器", null, null, submarineSpeed, null, submarineMaxLoad, submarineMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人潜航器", null, null, submarineSpeed, null, currentresourcesTotal, submarineMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 	} else if (taskEquipment == 2) {
 		let i = 0;
 		for (i; i < ship; i++) {
-			var deviceInfo = new info(i + 1, "无人船", null, null, shipSpeed, null, shipMaxLoad, shipMaxTime, null, "未启用");
+			if(currentresourcesTotal > shipMaxLoad){
+				currentresourcesTotal -= shipMaxLoad;
+				var deviceInfo = new info(i + 1, "无人艇", null, null, shipSpeed, null, shipMaxLoad, shipMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人艇", null, null, shipSpeed, null, currentresourcesTotal, shipMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 		for (i; i < drones + ship; i++) {
-			var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, droneMaxLoad, droneMaxTime, null, "未启用");
+			if(currentresourcesTotal > droneMaxLoad){
+				currentresourcesTotal -= droneMaxLoad;
+				var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, droneMaxLoad, droneMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, currentresourcesTotal, droneMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 		for (i; i < drones + ship + submarine; i++) {
-			var deviceInfo = new info(i + 1, "无人潜艇", null, null, submarineSpeed, null, submarineMaxLoad, submarineMaxTime, null, "未启用");
+			if(currentresourcesTotal > submarineMaxLoad){
+				currentresourcesTotal -= submarineMaxLoad;
+				var deviceInfo = new info(i + 1, "无人潜航器", null, null, submarineSpeed, null, submarineMaxLoad, submarineMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人潜航器", null, null, submarineSpeed, null, currentresourcesTotal, submarineMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 	} else if (taskEquipment == 3) {
 		let i = 0;
 		for (i; i < submarine; i++) {
-			var deviceInfo = new info(i + 1, "无人潜艇", null, null, submarineSpeed, null, submarineMaxLoad, submarineMaxTime, null, "未启用");
+			if(currentresourcesTotal > submarineMaxLoad){
+				currentresourcesTotal -= submarineMaxLoad;
+				var deviceInfo = new info(i + 1, "无人潜航器", null, null, submarineSpeed, null, submarineMaxLoad, submarineMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人潜航器", null, null, submarineSpeed, null, currentresourcesTotal, submarineMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 		for (i; i < drones + submarine; i++) {
-			var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, droneMaxLoad, droneMaxTime, null, "未启用");
+			if(currentresourcesTotal > droneMaxLoad){
+				currentresourcesTotal -= droneMaxLoad;
+				var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, droneMaxLoad, droneMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, currentresourcesTotal, droneMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 		for (i; i < drones + ship + submarine; i++) {
-			var deviceInfo = new info(i + 1, "无人船", null, null, shipSpeed, null, shipMaxLoad, shipMaxTime, null, "未启用");
+			if(currentresourcesTotal > shipMaxLoad){
+				currentresourcesTotal -= shipMaxLoad;
+				var deviceInfo = new info(i + 1, "无人艇", null, null, shipSpeed, null, shipMaxLoad, shipMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人艇", null, null, shipSpeed, null, currentresourcesTotal, shipMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 	} else {
 		let i = 0;
 		for (i; i < drones; i++) {
-			var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, droneMaxLoad, droneMaxTime, null, "未启用");
+			if(currentresourcesTotal > droneMaxLoad){
+				currentresourcesTotal -= droneMaxLoad;
+				var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, droneMaxLoad, droneMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人机", null, null, droneSpeed, null, currentresourcesTotal, droneMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 		for (i; i < drones + ship; i++) {
-			var deviceInfo = new info(i + 1, "无人船", null, null, shipSpeed, null, shipMaxLoad, shipMaxTime, null, "未启用");
+			if(currentresourcesTotal > shipMaxLoad){
+				currentresourcesTotal -= shipMaxLoad;
+				var deviceInfo = new info(i + 1, "无人艇", null, null, shipSpeed, null, shipMaxLoad, shipMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人艇", null, null, shipSpeed, null, currentresourcesTotal, shipMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 		for (i; i < drones + ship + submarine; i++) {
-			var deviceInfo = new info(i + 1, "无人潜艇", null, null, submarineSpeed, null, submarineMaxLoad, submarineMaxTime, null, "未启用");
+			if(currentresourcesTotal > submarineMaxLoad){
+				currentresourcesTotal -= submarineMaxLoad;
+				var deviceInfo = new info(i + 1, "无人潜航器", null, null, submarineSpeed, null, submarineMaxLoad, submarineMaxTime, null, "未启用");
+			}else{
+				var deviceInfo = new info(i + 1, "无人潜航器", null, null, submarineSpeed, null, currentresourcesTotal, submarineMaxTime, null, "未启用");
+				currentresourcesTotal = 0;
+			}
 			tableData.push(deviceInfo);
 		}
 	}

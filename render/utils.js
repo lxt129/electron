@@ -84,6 +84,10 @@ function randomNumber(boundary) {
 function distance(p1, p2) {
 	return euclidean(p1.x - p2.x, p1.y - p2.y);
 }
+
+function distance1(p1, p2) {
+	return euclidean(p1.x * ratio - p2.x * ratio, p1.y * ratio- p2.y* ratio);
+}
 //计算距离
 function euclidean(dx, dy) {
 	return Math.sqrt(dx * dx + dy * dy);
@@ -101,9 +105,9 @@ function findPoint(points, point) {
 
 //计算一段路的距离
 function routeDistance(route){
-	let routeDistance = distance(route[0],route[route.length - 1]);
+	let routeDistance = distance1(route[0],route[route.length - 1]);
 	for (let i = 1; i < route.length; i++) {
-		routeDistance += distance(route[i - 1],route[i]);
+		routeDistance += distance1(route[i - 1],route[i]);
 	}
 	return routeDistance.toFixed(2);
 }

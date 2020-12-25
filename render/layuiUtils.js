@@ -112,7 +112,7 @@ layui.use(['element', 'layer', 'form','table'], function () {
             field: 'type', 
             title: '设备种类',
             align: 'center',
-            width:'90'
+            width:'105'
           },
           {
             field: 'target', 
@@ -197,8 +197,8 @@ layui.use(['element', 'layer', 'form','table'], function () {
           <label class="layui-form-label">选择优先派出设备</label>
           <div class="layui-input-block" style="margin-left: 145px;">
               <input type="radio" name="taskEquipment" value="1" title="优先派出无人机">
-              <input type="radio" name="taskEquipment" value="2" title="优先派出无人船">
-              <input type="radio" name="taskEquipment" value="3" title="优先派出无人潜艇">
+              <input type="radio" name="taskEquipment" value="2" title="优先派出无人艇">
+              <input type="radio" name="taskEquipment" value="3" title="优先派出无人潜航器">
           </div>
         </div>
         <div class="layui-form-item">
@@ -269,6 +269,9 @@ layui.use(['element', 'layer', 'form','table'], function () {
         layer.closeAll(); //疯狂模式，关闭所有层
       }
       });
+    },
+    taskFail:function(){
+      layer.alert('无人平台数量过少，请增加无人平台数，或者改变任务方案！', {icon: 5}); 
     }
   }
   window.tools = _tools;
